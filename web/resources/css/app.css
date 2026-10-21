@@ -1,0 +1,456 @@
+@import 'tailwindcss';
+
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+
+@custom-variant dark (&:where([data-tema=gelap], [data-tema=gelap] *));
+
+/*
+ * Token warna. Nilainya berganti lewat atribut data-tema pada <html> (gelap = bawaan).
+ * Warna data mengikuti palet yang lolos uji buta warna; tiap dataset (D1–D5) & analisis gabungan (G2, G3)
+ * memiliki token warna sendiri (--ds-aksen, --ds-aksen-2, --ds-teks, --ds-lembut, --ds-garis).
+ */
+/* Tema "hutan siang" (bawaan): kertas krem, hijau hutan, cokelat kayu */
+:root {
+    --page: #f2eee3;
+    --surface: #fffdf8;
+    --surface-2: #f6f1e4;
+    --garis: rgba(74, 58, 30, 0.13);
+    --ink: #1e2a1f;
+    --ink-2: #4b5244;
+    --ink-3: #807a66;
+    --brand: #2f6b3f;
+    --brand-teks: #2a6338;
+    --brand-lembut: rgba(47, 107, 63, 0.10);
+    --kayu: #8b5a2b;
+    --kayu-lembut: rgba(139, 90, 43, 0.11);
+    --hutan-tua: #1e3a28;
+    --sorot: rgba(47, 107, 63, 0.05);
+    --peringatan: #a5461f;
+    --peringatan-lembut: rgba(192, 80, 46, 0.09);
+
+    /* Token bawaan dataset (default ke brand hutan) */
+    --ds-aksen: var(--brand);
+    --ds-aksen-2: #4a9a63;
+    --ds-teks: var(--brand-teks);
+    --ds-lembut: var(--brand-lembut);
+    --ds-garis: rgba(47, 107, 63, 0.24);
+    color-scheme: light;
+}
+
+/* Tema "hutan malam": hijau tua, bukan hitam */
+[data-tema='gelap'] {
+    --page: #0e1a13;
+    --surface: #13241b;
+    --surface-2: #1a2f23;
+    --garis: rgba(214, 232, 200, 0.10);
+    --ink: #ecf0e4;
+    --ink-2: #c4ccb8;
+    --ink-3: #8f9b87;
+    --brand: #4caf7a;
+    --brand-teks: #8fd3a6;
+    --brand-lembut: rgba(76, 175, 122, 0.15);
+    --kayu: #c99a6b;
+    --kayu-lembut: rgba(201, 154, 107, 0.14);
+    --hutan-tua: #0b1610;
+    --sorot: rgba(214, 232, 200, 0.04);
+    --peringatan: #eb9a7c;
+    --peringatan-lembut: rgba(216, 102, 74, 0.13);
+
+    --ds-aksen: var(--brand);
+    --ds-aksen-2: #2e8558;
+    --ds-teks: var(--brand-teks);
+    --ds-lembut: var(--brand-lembut);
+    --ds-garis: rgba(76, 175, 122, 0.26);
+    color-scheme: dark;
+}
+
+/* ==========================================================================
+ * TEMA PER DATASET (D1–D5) & ANALISIS GABUNGAN (G2, G3)
+ * ========================================================================== */
+
+/* D1 · Tutupan Kelas Lahan / Hutan Primer — Kanopi Rimba Tua (Emerald Pine) */
+[data-ds='D1'],
+[data-ds='primer'] {
+    --ds-aksen: #1d6b43;
+    --ds-aksen-2: #3b9664;
+    --ds-teks: #165635;
+    --ds-lembut: rgba(29, 107, 67, 0.11);
+    --ds-garis: rgba(29, 107, 67, 0.26);
+}
+[data-tema='gelap'] [data-ds='D1'],
+[data-tema='gelap'] [data-ds='primer'] {
+    --ds-aksen: #52c788;
+    --ds-aksen-2: #2b8a57;
+    --ds-teks: #8ee2b3;
+    --ds-lembut: rgba(82, 199, 136, 0.16);
+    --ds-garis: rgba(82, 199, 136, 0.30);
+}
+
+/* D2 · Tutupan Hutan & Non-Hutan Provinsi — Daun & Hamparan Hijau (Leaf / Moss Green) */
+[data-ds='D2'],
+[data-ds='tutupan'] {
+    --ds-aksen: #2f7d4f;
+    --ds-aksen-2: #62ab65;
+    --ds-teks: #23653e;
+    --ds-lembut: rgba(47, 125, 79, 0.11);
+    --ds-garis: rgba(47, 125, 79, 0.26);
+}
+[data-tema='gelap'] [data-ds='D2'],
+[data-tema='gelap'] [data-ds='tutupan'] {
+    --ds-aksen: #5ec47e;
+    --ds-aksen-2: #3a9e6a;
+    --ds-teks: #9be0b0;
+    --ds-lembut: rgba(94, 196, 126, 0.16);
+    --ds-garis: rgba(94, 196, 126, 0.30);
+}
+
+/* D3 · Kebakaran Hutan & Lahan (Karhutla) — Bara & Lidah Api (Ember Terracotta) */
+[data-ds='D3'],
+[data-ds='karhutla'] {
+    --ds-aksen: #c0502e;
+    --ds-aksen-2: #e07a47;
+    --ds-teks: #9e391b;
+    --ds-lembut: rgba(192, 80, 46, 0.11);
+    --ds-garis: rgba(192, 80, 46, 0.28);
+}
+[data-tema='gelap'] [data-ds='D3'],
+[data-tema='gelap'] [data-ds='karhutla'] {
+    --ds-aksen: #e87052;
+    --ds-aksen-2: #f29d6b;
+    --ds-teks: #ffad96;
+    --ds-lembut: rgba(232, 112, 82, 0.16);
+    --ds-garis: rgba(232, 112, 82, 0.32);
+}
+
+/* D4 · Produksi Kayu Bulat — Serat & Batang Kayu (Teak / Timber Brown) */
+[data-ds='D4'],
+[data-ds='kayu'] {
+    --ds-aksen: #9c5a1f;
+    --ds-aksen-2: #c48344;
+    --ds-teks: #784312;
+    --ds-lembut: rgba(156, 90, 31, 0.12);
+    --ds-garis: rgba(156, 90, 31, 0.28);
+}
+[data-tema='gelap'] [data-ds='D4'],
+[data-tema='gelap'] [data-ds='kayu'] {
+    --ds-aksen: #d49252;
+    --ds-aksen-2: #b97c44;
+    --ds-teks: #f0be8d;
+    --ds-lembut: rgba(212, 146, 82, 0.16);
+    --ds-garis: rgba(212, 146, 82, 0.32);
+}
+
+/* D5 · Deforestasi Netto — Lahan Terbuka & Kapak Tebangan (Savanna Ochre / Amber) */
+[data-ds='D5'],
+[data-ds='deforestasi'] {
+    --ds-aksen: #c58a14;
+    --ds-aksen-2: #dfab36;
+    --ds-teks: #8f6207;
+    --ds-lembut: rgba(197, 138, 20, 0.13);
+    --ds-garis: rgba(197, 138, 20, 0.30);
+}
+[data-tema='gelap'] [data-ds='D5'],
+[data-tema='gelap'] [data-ds='deforestasi'] {
+    --ds-aksen: #e6ad3a;
+    --ds-aksen-2: #c9962a;
+    --ds-teks: #f8cf79;
+    --ds-lembut: rgba(230, 173, 58, 0.16);
+    --ds-garis: rgba(230, 173, 58, 0.32);
+}
+
+/* G2 · Analisis Gabungan Kebakaran vs Deforestasi (D3 × D5) */
+[data-ds='G2'] {
+    --ds-aksen: #c0502e;
+    --ds-aksen-2: #c58a14;
+    --ds-teks: #9e391b;
+    --ds-lembut: rgba(192, 80, 46, 0.11);
+    --ds-garis: rgba(194, 104, 34, 0.30);
+}
+[data-tema='gelap'] [data-ds='G2'] {
+    --ds-aksen: #e87052;
+    --ds-aksen-2: #e6ad3a;
+    --ds-teks: #ffb68c;
+    --ds-lembut: rgba(232, 112, 82, 0.16);
+    --ds-garis: rgba(231, 142, 70, 0.32);
+}
+
+/* G3 · Analisis Gabungan Benang Merah Provinsi (D3 × D4 × D5) */
+[data-ds='G3'] {
+    --ds-aksen: #9c5a1f;
+    --ds-aksen-2: #2f7d4f;
+    --ds-teks: #784312;
+    --ds-lembut: rgba(156, 90, 31, 0.11);
+    --ds-garis: rgba(143, 96, 48, 0.28);
+}
+[data-tema='gelap'] [data-ds='G3'] {
+    --ds-aksen: #d49252;
+    --ds-aksen-2: #5ec47e;
+    --ds-teks: #f0be8d;
+    --ds-lembut: rgba(212, 146, 82, 0.16);
+    --ds-garis: rgba(180, 148, 92, 0.30);
+}
+
+@theme inline {
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --color-page: var(--page);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-garis: var(--garis);
+    --color-ink: var(--ink);
+    --color-ink-2: var(--ink-2);
+    --color-ink-3: var(--ink-3);
+    --color-brand: var(--brand);
+    --color-brand-teks: var(--brand-teks);
+    --color-brand-lembut: var(--brand-lembut);
+    --color-sorot: var(--sorot);
+    --color-kayu: var(--kayu);
+    --color-kayu-lembut: var(--kayu-lembut);
+    --color-hutan-tua: var(--hutan-tua);
+    --color-peringatan: var(--peringatan);
+    --color-peringatan-lembut: var(--peringatan-lembut);
+}
+
+@layer components {
+    .kartu {
+        @apply relative min-w-0 overflow-hidden rounded-2xl border border-garis bg-surface p-4;
+        box-shadow: 0 2px 10px -4px rgba(30, 42, 31, 0.06);
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .kartu:hover {
+        box-shadow: 0 6px 18px -8px rgba(30, 42, 31, 0.14);
+    }
+
+    /* Kartu dengan tema dataset atau analisis gabungan: garis aksen tipis di atas + bingkai berwarna lembut */
+    .kartu[data-ds] {
+        border-color: var(--ds-garis);
+        background-image: linear-gradient(var(--ds-aksen), var(--ds-aksen));
+        background-size: 100% 3px;
+        background-position: top left;
+        background-repeat: no-repeat;
+    }
+
+    /* Sub-kartu beridentitas dataset (mis. panel indeks G1, kotak metrik G2) */
+    .subkartu-ds {
+        @apply relative overflow-hidden rounded-xl border p-3;
+        border-color: var(--ds-garis);
+        background-color: var(--surface-2);
+    }
+
+    /* Ikon & Lencana Kode Dataset */
+    .ikon-ds {
+        @apply grid shrink-0 place-items-center rounded-xl;
+        background-color: var(--ds-lembut);
+        color: var(--ds-teks);
+        box-shadow: inset 0 0 0 1px var(--ds-garis);
+    }
+    .lencana-ds {
+        @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10.5px] font-bold tracking-wide uppercase whitespace-nowrap;
+        background-color: var(--ds-lembut);
+        color: var(--ds-teks);
+        box-shadow: inset 0 0 0 1px var(--ds-garis);
+    }
+
+    /* Hiasan samar di sudut kartu KPI (hanya di Ringkasan, tidak di kartu grafik agar tidak menimpa grafik) */
+    .dekor-ds {
+        @apply pointer-events-none absolute -top-2 -right-2 size-24 opacity-[0.11];
+        color: var(--ds-aksen);
+    }
+    [data-tema='gelap'] .dekor-ds {
+        @apply opacity-[0.15];
+    }
+
+    /* Kotak ringkasan temuan di bawah grafik */
+    .ringkas-ds {
+        @apply mt-3 rounded-xl border-l-[3px] px-3 py-2 text-[12.5px] leading-snug text-pretty text-ink-2;
+        border-left-color: var(--ds-aksen);
+        background-color: color-mix(in srgb, var(--ds-lembut) 48%, var(--surface-2));
+    }
+
+    .kartu-judul {
+        @apply text-[13.5px] leading-snug font-semibold text-ink;
+    }
+    .kartu-ket {
+        @apply mt-0.5 mb-3 text-[11.5px] leading-snug text-pretty text-ink-3;
+    }
+    /* Catatan kaki di bawah grafik/peta: rapi, kecil, dipisah garis tipis */
+    .catatan-kaki {
+        @apply mt-3 border-t border-garis pt-2.5 text-[11.5px] leading-relaxed text-pretty text-ink-3;
+    }
+    .lencana {
+        @apply inline-flex items-center gap-1 rounded-full border border-garis bg-surface-2 px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap text-ink-2;
+    }
+
+    /* Pola insight: apa yang terlihat -> kenapa -> sambungan */
+    .insight {
+        @apply grid content-start gap-2.5 rounded-2xl border border-garis bg-surface p-4 text-[13px] leading-relaxed text-pretty text-ink-2;
+        container-type: inline-size;
+    }
+    .insight p {
+        @apply relative;
+    }
+    .insight b {
+        @apply block pt-0.5 text-[10.5px] font-semibold uppercase;
+        color: var(--ds-teks, var(--brand-teks));
+    }
+    /* Kenapa & Lanjut dilipat */
+    .insight details.lipat summary {
+        @apply inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-ink-3 select-none hover:text-ink-2;
+    }
+    .insight details.lipat summary::after {
+        content: '+';
+        @apply font-semibold;
+    }
+    .insight details.lipat[open] summary::after {
+        content: '−';
+    }
+
+    /* Tombol ⓘ di kartu grafik + panel penjelasan (popover bawaan browser, tanpa JS) */
+    .tombol-info {
+        @apply relative z-10 grid size-6 shrink-0 cursor-pointer place-items-center rounded-full border font-serif text-xs font-semibold italic transition-colors;
+        border-color: var(--ds-garis, var(--garis));
+        background-color: var(--ds-lembut, var(--surface-2));
+        color: var(--ds-teks, var(--ink-2));
+    }
+    .tombol-info:hover {
+        border-color: var(--ds-aksen, var(--brand));
+        filter: brightness(0.95);
+    }
+    .popover-info {
+        @apply m-auto w-[min(92vw,560px)] rounded-2xl border bg-surface p-5 text-ink shadow-[0_24px_60px_-20px_rgba(20,30,15,0.45)];
+        border-color: var(--ds-garis, var(--garis));
+        background-image: linear-gradient(90deg, var(--ds-aksen), var(--ds-aksen-2));
+        background-size: 100% 4px;
+        background-position: top left;
+        background-repeat: no-repeat;
+    }
+    .popover-info::backdrop {
+        background: rgba(20, 30, 15, 0.35);
+    }
+    .popover-info .insight {
+        @apply border-0 p-0;
+    }
+    .insight.peringatan {
+        @apply border-peringatan/30 bg-peringatan-lembut;
+    }
+    .insight.peringatan b {
+        @apply text-peringatan;
+    }
+
+    .tabel-data {
+        @apply w-full border-collapse text-[12.5px];
+    }
+    .tabel-data th {
+        @apply border-b border-garis px-3 py-2 text-left text-[10.5px] font-semibold uppercase;
+        color: var(--ds-teks, var(--ink-3));
+        background-color: color-mix(in srgb, var(--ds-lembut) 35%, transparent);
+    }
+    .tabel-data td {
+        @apply border-b border-garis px-3 py-2 align-top text-ink-2;
+    }
+    .tabel-data tr:last-child td {
+        @apply border-b-0;
+    }
+    .tabel-data .angka {
+        @apply text-right tabular-nums;
+    }
+
+    .pil-ok {
+        @apply inline-flex items-center gap-1 rounded-full bg-brand-lembut px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap text-brand-teks;
+    }
+    .pil-cek {
+        @apply inline-flex items-center gap-1 rounded-full bg-peringatan-lembut px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap text-peringatan;
+    }
+
+    details.lihat-tabel {
+        @apply mt-3 text-xs text-ink-3;
+    }
+    details.lihat-tabel summary {
+        @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-2 py-1 font-medium select-none hover:border-garis hover:bg-surface-2 hover:text-ink-2;
+    }
+    details.lihat-tabel[open] summary {
+        color: var(--ds-teks, var(--ink-2));
+        background-color: var(--ds-lembut, var(--surface-2));
+    }
+    /* Lipatan bukti teknis di bagian Integrasi */
+    details.detail-teknis > summary {
+        @apply flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-garis bg-surface px-4 py-3 text-[13px] font-medium text-ink-2 select-none hover:text-ink;
+    }
+    details.detail-teknis > summary::-webkit-details-marker {
+        display: none;
+    }
+    details.detail-teknis > summary::after {
+        content: '+';
+        @apply text-base leading-none text-ink-3;
+    }
+    details.detail-teknis[open] > summary::after {
+        content: '−';
+    }
+    details.lihat-tabel .isi {
+        @apply mt-2 max-h-72 overflow-auto rounded-xl border;
+        border-color: var(--ds-garis, var(--garis));
+    }
+
+    /* Tab utama */
+    .tab {
+        @apply relative shrink-0 rounded-lg px-3 py-1.5 text-[13px] font-medium text-ink-3 transition-colors hover:text-ink;
+    }
+    .tab[aria-current='true'] {
+        @apply bg-brand-lembut font-semibold text-brand-teks shadow-[inset_0_0_0_1px_var(--ds-garis)];
+    }
+
+    /* Kontrol pilihan (dropdown) */
+    .pilih {
+        @apply relative z-10 cursor-pointer appearance-none rounded-lg border bg-surface-2 py-2 pr-9 pl-3 text-[13px] font-medium text-ink outline-none transition-colors;
+        border-color: var(--ds-garis, var(--garis));
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8a83' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+    .pilih:hover,
+    .pilih:focus {
+        border-color: var(--ds-aksen, var(--brand));
+    }
+    .label-kontrol {
+        @apply mb-1.5 block text-[11px] font-semibold uppercase;
+        color: var(--ds-teks, var(--ink-3));
+    }
+
+    /* Tombol pemilih cepat dataset pada peta sebaran */
+    .pil-peta-ds {
+        @apply inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-garis bg-surface px-3 py-1.5 text-xs font-medium text-ink-2 hover:border-[var(--ds-garis)] hover:bg-[var(--ds-lembut)] hover:text-[var(--ds-teks)];
+    }
+    .pil-peta-ds[aria-pressed='true'] {
+        border-color: var(--ds-aksen);
+        background-color: var(--ds-lembut);
+        color: var(--ds-teks);
+        box-shadow: inset 0 0 0 1px var(--ds-aksen);
+        font-weight: 600;
+    }
+}
+
+@container (min-width: 32rem) {
+    .insight p {
+        padding-left: 104px;
+    }
+    .insight b {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6rem;
+    }
+}
+
+#peta path:hover,
+#peta path:focus-visible {
+    filter: brightness(0.92);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+[hidden] {
+    display: none !important;
+}

@@ -1,0 +1,12 @@
+node_modules
+tests
+storage/logs
+storage/framework
+.env
+.env.example
+resources/js
+resources/css
+vite.config.js
+package.json
+package-lock.json
+phpunit.xml

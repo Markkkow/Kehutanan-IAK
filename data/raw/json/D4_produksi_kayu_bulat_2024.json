@@ -1,0 +1,241 @@
+{
+  "status": "OK",
+  "data-availability": "available",
+  "last_update": "2026-08-28 09:33:01",
+  "subject": [
+    {
+      "val": 557,
+      "label": "Pertanian, Kehutanan, Perikanan"
+    }
+  ],
+  "var": [
+    {
+      "val": 2165,
+      "label": "Produksi Kayu Bulat Menurut Provinsi",
+      "unit": "M3",
+      "subj": "Kehutanan",
+      "def": "",
+      "decimal": 2,
+      "note": "<p><br /></p><p><br /></p><p><br /></p><p>Sumber : Data Kehutanan Triwulanan, BPS<br /></p><p><br /></p><p><br /></p><p><br /></p>"
+    }
+  ],
+  "turvar": [
+    {
+      "val": "0",
+      "label": "Tidak ada"
+    }
+  ],
+  "labelvervar": "38 Provinsi",
+  "vervar": [
+    {
+      "val": 1100,
+      "label": "ACEH"
+    },
+    {
+      "val": 1200,
+      "label": "SUMATERA UTARA"
+    },
+    {
+      "val": 1300,
+      "label": "SUMATERA BARAT"
+    },
+    {
+      "val": 1400,
+      "label": "RIAU"
+    },
+    {
+      "val": 1500,
+      "label": "JAMBI"
+    },
+    {
+      "val": 1600,
+      "label": "SUMATERA SELATAN"
+    },
+    {
+      "val": 1700,
+      "label": "BENGKULU"
+    },
+    {
+      "val": 1800,
+      "label": "LAMPUNG"
+    },
+    {
+      "val": 1900,
+      "label": "KEP. BANGKA BELITUNG"
+    },
+    {
+      "val": 2100,
+      "label": "KEP. RIAU"
+    },
+    {
+      "val": 3100,
+      "label": "DKI JAKARTA"
+    },
+    {
+      "val": 3200,
+      "label": "JAWA BARAT"
+    },
+    {
+      "val": 3300,
+      "label": "JAWA TENGAH"
+    },
+    {
+      "val": 3400,
+      "label": "DI YOGYAKARTA"
+    },
+    {
+      "val": 3500,
+      "label": "JAWA TIMUR"
+    },
+    {
+      "val": 3600,
+      "label": "BANTEN"
+    },
+    {
+      "val": 5100,
+      "label": "BALI"
+    },
+    {
+      "val": 5200,
+      "label": "NUSA TENGGARA BARAT"
+    },
+    {
+      "val": 5300,
+      "label": "NUSA TENGGARA TIMUR"
+    },
+    {
+      "val": 6100,
+      "label": "KALIMANTAN BARAT"
+    },
+    {
+      "val": 6200,
+      "label": "KALIMANTAN TENGAH"
+    },
+    {
+      "val": 6300,
+      "label": "KALIMANTAN SELATAN"
+    },
+    {
+      "val": 6400,
+      "label": "KALIMANTAN TIMUR"
+    },
+    {
+      "val": 6500,
+      "label": "KALIMANTAN UTARA"
+    },
+    {
+      "val": 7100,
+      "label": "SULAWESI UTARA"
+    },
+    {
+      "val": 7200,
+      "label": "SULAWESI TENGAH"
+    },
+    {
+      "val": 7300,
+      "label": "SULAWESI SELATAN"
+    },
+    {
+      "val": 7400,
+      "label": "SULAWESI TENGGARA"
+    },
+    {
+      "val": 7500,
+      "label": "GORONTALO"
+    },
+    {
+      "val": 7600,
+      "label": "SULAWESI BARAT"
+    },
+    {
+      "val": 8100,
+      "label": "MALUKU"
+    },
+    {
+      "val": 8200,
+      "label": "MALUKU UTARA"
+    },
+    {
+      "val": 9100,
+      "label": "PAPUA BARAT"
+    },
+    {
+      "val": 9200,
+      "label": "PAPUA BARAT DAYA"
+    },
+    {
+      "val": 9400,
+      "label": "PAPUA"
+    },
+    {
+      "val": 9500,
+      "label": "PAPUA SELATAN"
+    },
+    {
+      "val": 9600,
+      "label": "PAPUA TENGAH"
+    },
+    {
+      "val": 9700,
+      "label": "PAPUA PEGUNUNGAN"
+    },
+    {
+      "val": 9999,
+      "label": "INDONESIA"
+    }
+  ],
+  "tahun": [
+    {
+      "val": 124,
+      "label": "2024"
+    }
+  ],
+  "turtahun": [
+    {
+      "val": 0,
+      "label": "Tahun"
+    }
+  ],
+  "datacontent": {
+    "1200216501240": 1994591.18,
+    "7300216501240": 23672.31,
+    "1300216501240": 259045.19,
+    "9999216501240": 64839314.19,
+    "7100216501240": 4913.93,
+    "9600216501240": 60011.06,
+    "1500216501240": 5463671.17,
+    "1900216501240": 3657.3,
+    "2100216501240": 2650.2,
+    "6400216501240": 6297116.63,
+    "6100216501240": 1665428.11,
+    "6500216501240": 1463631.43,
+    "9100216501240": 519253.18,
+    "7600216501240": 711.05,
+    "8100216501240": 155799.82,
+    "6300216501240": 477250.17,
+    "7200216501240": 45878.7,
+    "9400216501240": 134019.2,
+    "8200216501240": 341534.74,
+    "3400216501240": 96771.37,
+    "5100216501240": 0,
+    "3100216501240": 0,
+    "5200216501240": 17113.17,
+    "9700216501240": 0,
+    "5300216501240": 5.82,
+    "1600216501240": 10357065.16,
+    "7400216501240": 43365.94,
+    "1400216501240": 23713283.84,
+    "6200216501240": 3251161.38,
+    "3300216501240": 1951045.19,
+    "3600216501240": 27979.03,
+    "7500216501240": 292529.58,
+    "1100216501240": 28202.97,
+    "9200216501240": 7967.43,
+    "1800216501240": 449828.36,
+    "3500216501240": 4371775.76,
+    "9500216501240": 552456.09,
+    "1700216501240": 4029.36,
+    "3200216501240": 761898.37
+  },
+  "related": []
+}
