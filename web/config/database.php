@@ -45,6 +45,21 @@ return [
 
         // Postgres / Supabase. Di Vercel isi DB_HOST dengan host Transaction pooler (port 6543).
         // Transaction pooler tidak mendukung prepared statement, jadi ATTR_EMULATE_PREPARES dinyalakan.
+        // Pengembangan lokal dengan MariaDB XAMPP (DB_CONNECTION=mariadb); versi online memakai pgsql
+        'mariadb' => [
+            'driver' => 'mariadb',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'kehutanan_dashboard'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
@@ -65,7 +80,8 @@ return [
         // memakai nama tabel berawalan schema. Kosong = sama dengan koneksi utama. Isi DATA_DB_HOST bila ingin
         // membaca dari Supabase Read Replica.
         'data' => [
-            'driver' => 'pgsql',
+            // pgsql = Supabase (online). Pengembangan lokal dengan MariaDB XAMPP: DATA_DB_DRIVER=mariadb
+            'driver' => env('DATA_DB_DRIVER', 'pgsql'),
             'host' => env('DATA_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
             'port' => env('DATA_DB_PORT') ?: env('DB_PORT', '5432'),
             'database' => env('DATA_DB_DATABASE') ?: env('DB_DATABASE', 'postgres'),

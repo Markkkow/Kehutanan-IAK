@@ -454,3 +454,265 @@ html {
 [hidden] {
     display: none !important;
 }
+
+/* ==========================================================================
+ * BAB PER DATA (D1–D5): pembuka ala halaman produk, pembahasan bergeser, grafik
+ * Pembuka selalu gelap (seperti panggung), terlepas dari tema terang/gelap.
+ * Warna cahaya tiap bab = warna data versi terang agar kontras di latar gelap.
+ * ========================================================================== */
+[data-bab][data-ds='D1'] { --bab-sinar: #52c788; }
+[data-bab][data-ds='D2'] { --bab-sinar: #8fd66f; }
+[data-bab][data-ds='D3'] { --bab-sinar: #f0805c; }
+[data-bab][data-ds='D4'] { --bab-sinar: #d9a066; }
+[data-bab][data-ds='D5'] { --bab-sinar: #ecb84a; }
+
+.bab {
+    position: relative;
+    margin-top: 4.5rem;
+}
+
+.bab-pembuka {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 88svh;
+    overflow: hidden;
+    border-radius: 2rem;
+    padding: clamp(1.75rem, 6vw, 6rem);
+    background: #08110c;
+    color: #f4f7f1;
+}
+.bab-sinar {
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    background:
+        radial-gradient(42% 46% at 72% 62%, color-mix(in srgb, var(--bab-sinar) 55%, transparent), transparent 70%),
+        radial-gradient(30% 34% at 18% 22%, color-mix(in srgb, var(--bab-sinar) 18%, transparent), transparent 70%);
+    filter: blur(28px);
+}
+.bab-pembuka-isi {
+    max-width: 68rem;
+    transform-origin: left center;
+}
+.bab-kode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgb(244 247 241 / 0.72);
+}
+.bab-kode span {
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-weight: 700;
+    color: #08110c;
+    background: var(--bab-sinar);
+}
+.bab-judul {
+    margin-top: 1.25rem;
+    font-size: clamp(2.4rem, 6.4vw, 6rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+}
+.bab-judul .kata {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    vertical-align: top;
+}
+.bab-judul .kata > span {
+    display: inline-block;
+}
+.bab-angka {
+    margin-top: clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-size: clamp(3.4rem, 11vw, 9.5rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+}
+.bab-angka > span {
+    background: linear-gradient(100deg, #ffffff 15%, var(--bab-sinar) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.bab-angka small {
+    font-size: 0.3em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgb(244 247 241 / 0.7);
+}
+.bab-ket {
+    margin-top: 1rem;
+    max-width: 44rem;
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    line-height: 1.45;
+    color: rgb(244 247 241 / 0.82);
+}
+.bab-ket span {
+    color: rgb(244 247 241 / 0.5);
+}
+/* petunjuk gulir: garis yang "mengalir" ke bawah */
+.bab-gulir {
+    position: absolute;
+    bottom: 1.75rem;
+    left: 50%;
+    width: 1px;
+    height: 3rem;
+    overflow: hidden;
+    background: rgb(244 247 241 / 0.15);
+}
+.bab-gulir span {
+    display: block;
+    width: 100%;
+    height: 40%;
+    background: var(--bab-sinar);
+    animation: bab-gulir 1.8s ease-in-out infinite;
+}
+@keyframes bab-gulir {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(260%); }
+}
+
+/* Pembahasan: tanpa JavaScript (dan di HP) = kartu yang bisa digeser jari dengan snap */
+.bab-slide {
+    margin-top: 1.25rem;
+}
+.bab-slide-jalur {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+.bab-slide-jalur::-webkit-scrollbar { display: none; }
+.bab-kartu {
+    flex: 0 0 min(46rem, 86%);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-height: clamp(13rem, 30vh, 19rem);
+    border-radius: 1.75rem;
+    border: 1px solid var(--garis);
+    border-top: 4px solid var(--ds-aksen);
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+    background: var(--surface);
+}
+.bab-kartu-kepala {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+}
+.bab-kartu-kepala span {
+    font-size: 0.45em;
+    font-weight: 700;
+    color: var(--ds-aksen);
+    font-variant-numeric: tabular-nums;
+}
+.bab-kartu p {
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+}
+.bab-slide-kepala {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ds-aksen);
+}
+.bab-slide-petunjuk {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-3);
+}
+.bab-slide-petunjuk .lebar { display: none; }
+/* Saat GSAP aktif di layar lebar, jalur digeser oleh scroll (bukan scrollbar); kartu dipotong rapi di tepi konten */
+.bab-slide.bab-slide-gsap {
+    overflow: hidden;
+    padding-block: 0.25rem;
+}
+.bab-slide.bab-slide-gsap .bab-slide-jalur {
+    overflow: visible;
+    scroll-snap-type: none;
+}
+.bab-slide.bab-slide-gsap .bab-slide-petunjuk .lebar { display: inline; }
+.bab-slide.bab-slide-gsap .bab-slide-petunjuk .sempit { display: none; }
+
+.bab-grafik {
+    margin-top: 1.25rem;
+}
+
+/* Penanda bab di kanan: hanya layar lebar, muncul saat bagian Per data terlihat */
+.bab-rel {
+    position: fixed;
+    top: 50%;
+    right: 1.1rem;
+    z-index: 25;
+    display: none;
+    flex-direction: column;
+    gap: 0.55rem;
+    transform: translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+@media (min-width: 1280px) {
+    .bab-rel { display: flex; }
+}
+.bab-rel.tampil {
+    opacity: 1;
+    pointer-events: auto;
+}
+.bab-rel a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--ink-3);
+}
+.bab-rel a b {
+    font-weight: 700;
+}
+.bab-rel-isi {
+    position: relative;
+    width: 3px;
+    height: 2.2rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--garis);
+}
+.bab-rel-isi i {
+    position: absolute;
+    inset: 0;
+    background: var(--ds-aksen);
+    transform: scaleY(0);
+    transform-origin: top;
+}
+.bab-rel a.aktif {
+    color: var(--ds-aksen);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bab-gulir span { animation: none; }
+}
