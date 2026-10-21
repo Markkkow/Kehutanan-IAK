@@ -571,6 +571,16 @@ const pengamatMenu = new IntersectionObserver((entri) => entri.forEach((e) => {
 }), { rootMargin: '-40% 0px -55% 0px' });
 document.querySelectorAll('[data-panel]').forEach((s) => pengamatMenu.observe(s));
 
+// latar halaman berganti mengikuti slide data (D1–D5) yang sedang di tengah layar; di luar bagian per-data, latar kembali normal
+const akar = document.documentElement;
+const pengamatSlide = new IntersectionObserver((entri) => entri.forEach((e) => {
+    if (e.isIntersecting) akar.dataset.slide = e.target.dataset.slide;
+}), { rootMargin: '-45% 0px -50% 0px' });
+document.querySelectorAll('[data-slide]').forEach((s) => pengamatSlide.observe(s));
+document.querySelectorAll('[data-panel]:not(#per-data)').forEach((s) => new IntersectionObserver((entri) => entri.forEach((e) => {
+    if (e.isIntersecting) delete akar.dataset.slide;
+}), { rootMargin: '-40% 0px -55% 0px' }).observe(s));
+
 // ================================================================== per data: pilihan tahun peringkat provinsi
 [['pilihTahunKarhutla', 'chartKarhutlaProvinsi'], ['pilihTahunKayu', 'chartKayuProvinsi']].forEach(([sel, id]) =>
     document.getElementById(sel).addEventListener('change', () => bangunUlang(id)));

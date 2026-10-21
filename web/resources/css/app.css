@@ -454,3 +454,133 @@ html {
 [hidden] {
     display: none !important;
 }
+
+/* ==========================================================================
+ * GAYA TILE & SLIDE (kartu tebal bergaya sticker; dasar hijau, tiap data punya karakter sendiri)
+ * ========================================================================== */
+:root {
+    --font-tampil: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --tile-edge: #17301f;
+    --tile-line: #17301f;
+    --tile-ink: #14261a;
+    --tile-ink-2: #3c4f40;
+}
+[data-tema='gelap'] {
+    --tile-edge: #050c08;
+    --tile-line: rgba(214, 232, 200, 0.38);
+    --tile-ink: #ecf0e4;
+    --tile-ink-2: #b9c7b3;
+}
+
+/* Warna dasar tiap tile: semuanya keluarga hijau, dibedakan oleh rona dan hiasan; warna khas data hanya untuk stiker */
+.tile[data-ds='D1'] { --tile-bg: #c4e5cf; --tag-bg: #1d6b43; --tag-ink: #fff; --deko: #1d6b43; }
+.tile[data-ds='D2'] { --tile-bg: #d9ecab; --tag-bg: #2f7d4f; --tag-ink: #fff; --deko: #2f7d4f; }
+.tile[data-ds='D3'] { --tile-bg: #dce8cb; --tag-bg: #c0502e; --tag-ink: #fff; --deko: #c0502e; }
+.tile[data-ds='D4'] { --tile-bg: #cbd9a5; --tag-bg: #9c5a1f; --tag-ink: #fff; --deko: #9c5a1f; }
+.tile[data-ds='D5'] { --tile-bg: #bfe0d1; --tag-bg: #c58a14; --tag-ink: #1b1403; --deko: #c58a14; }
+[data-tema='gelap'] .tile[data-ds='D1'] { --tile-bg: #174029; --tag-bg: #52c788; --tag-ink: #06180d; --deko: #52c788; }
+[data-tema='gelap'] .tile[data-ds='D2'] { --tile-bg: #25401d; --tag-bg: #8fd36b; --tag-ink: #0b1707; --deko: #8fd36b; }
+[data-tema='gelap'] .tile[data-ds='D3'] { --tile-bg: #2a3a22; --tag-bg: #e87052; --tag-ink: #1d0802; --deko: #e87052; }
+[data-tema='gelap'] .tile[data-ds='D4'] { --tile-bg: #343a1c; --tag-bg: #d49252; --tag-ink: #1c1004; --deko: #d49252; }
+[data-tema='gelap'] .tile[data-ds='D5'] { --tile-bg: #163a33; --tag-bg: #e6ad3a; --tag-ink: #1b1403; --deko: #e6ad3a; }
+
+@layer components {
+    .tile {
+        @apply relative flex min-w-0 flex-col overflow-hidden rounded-[18px] p-4;
+        background: var(--tile-bg);
+        color: var(--tile-ink);
+        border: 2px solid var(--tile-line);
+        box-shadow: 5px 5px 0 var(--tile-edge);
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    .tile:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--tile-edge); }
+
+    .tile-tag {
+        @apply inline-block self-start rounded-md px-2 py-0.5 text-[11px] font-extrabold tracking-wider;
+        background: var(--tag-bg, var(--brand));
+        color: var(--tag-ink, #fff);
+        border: 2px solid var(--tile-line);
+        box-shadow: 2px 2px 0 var(--tile-edge);
+        transform: rotate(-3deg);
+    }
+    .tile-judul { @apply mt-3 text-[13px] leading-snug font-semibold; color: var(--tile-ink-2); }
+    .tile-angka {
+        @apply mt-1 text-[38px] leading-none font-extrabold tabular-nums;
+        font-family: var(--font-tampil);
+        letter-spacing: -0.02em;
+    }
+    .tile-angka small { @apply ml-1.5 text-sm font-semibold; letter-spacing: 0; color: var(--tile-ink-2); }
+    .tile-ket { color: var(--tile-ink-2); }
+    .tile-delta {
+        @apply inline-flex items-center rounded-md px-1.5 py-0.5 font-bold;
+        border: 2px solid var(--tile-line);
+        background: #fffdf8; color: #14261a;
+    }
+    .tile-delta[data-arah='baik'] { background: #1d6b43; color: #fff; }
+    .tile-delta[data-arah='buruk'] { background: #a5461f; color: #fff; }
+    .tile-spark { @apply mt-auto h-10 pt-2; }
+
+    /* D2: bar bersegmen ala indikator piksel, terisi sesuai % daratan */
+    .tile-seg {
+        @apply mt-3 h-4 rounded-[5px];
+        border: 2px solid var(--tile-line);
+        background: linear-gradient(90deg, var(--deko) calc(var(--pct) * 1%), rgba(255, 253, 248, 0.7) 0);
+        position: relative;
+    }
+    .tile-seg::after {
+        content: ''; position: absolute; inset: 0;
+        background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), var(--tile-line) calc(10% - 2px) 10%);
+        opacity: 0.55;
+    }
+
+    /* Hiasan khas tiap data (tanpa markup tambahan) */
+    .tile[data-ds='D1'] { padding-bottom: 2rem; }
+    .tile[data-ds='D1']::after { /* deretan pucuk pohon di dasar tile */
+        content: ''; position: absolute; inset: auto 0 0 0; height: 16px; background:
+            linear-gradient(135deg, var(--deko) 25%, transparent 25%) -9px 0,
+            linear-gradient(225deg, var(--deko) 25%, transparent 25%) -9px 0;
+        background-size: 18px 16px; opacity: 0.75;
+    }
+    .tile[data-ds='D3']::after { /* lidah api bergerigi di dasar */
+        content: ''; position: absolute; inset: auto 0 0 0; height: 10px; background:
+            linear-gradient(135deg, var(--deko) 25%, transparent 25%) -7px 0,
+            linear-gradient(225deg, var(--deko) 25%, transparent 25%) -7px 0;
+        background-size: 14px 10px;
+    }
+    .tile[data-ds='D3'] { padding-bottom: 1.6rem; }
+    .tile[data-ds='D4'] .tile-judul, .tile[data-ds='D5'] .tile-judul { max-width: 80%; }
+    .tile[data-ds='D4']::before { /* lingkaran tahun batang kayu */
+        content: ''; position: absolute; top: -52px; right: -52px; width: 130px; height: 130px; border-radius: 50%;
+        background: repeating-radial-gradient(circle, transparent 0 9px, var(--deko) 9px 11px); opacity: 0.35;
+    }
+    .tile[data-ds='D5']::before { /* garis coret tebangan */
+        content: ''; position: absolute; top: 14px; right: -30px; width: 92px; height: 11px; border-radius: 3px;
+        background: var(--deko); border: 2px solid var(--tile-line); transform: rotate(-38deg);
+    }
+
+    /* Slide per data: kepala menempel, latar halaman berganti halus */
+    .slide { @apply scroll-mt-[4.5rem] pt-10 pb-16; min-height: calc(100dvh - 4.5rem); scroll-snap-align: start; }
+    .slide-kepala { @apply sticky top-[4.4rem] z-20 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl px-1 py-2; }
+    .slide-kepala h2 { font-family: var(--font-tampil); @apply text-2xl font-extrabold md:text-3xl; letter-spacing: -0.02em; }
+    .slide-kepala p { @apply basis-full text-[13px] text-ink-2 md:basis-auto; }
+}
+
+html { scroll-snap-type: y proximity; }
+body { transition: background-color 0.7s ease; }
+header.sticky { transition: background-color 0.7s ease; }
+html[data-slide='D1'] { --page: #d3ead9; }
+html[data-slide='D2'] { --page: #e0efbd; }
+html[data-slide='D3'] { --page: #e3ecd2; }
+html[data-slide='D4'] { --page: #d8e2b6; }
+html[data-slide='D5'] { --page: #cfe6da; }
+html[data-tema='gelap'][data-slide='D1'] { --page: #0f2a1b; }
+html[data-tema='gelap'][data-slide='D2'] { --page: #15301a; }
+html[data-tema='gelap'][data-slide='D3'] { --page: #1a281b; }
+html[data-tema='gelap'][data-slide='D4'] { --page: #222915; }
+html[data-tema='gelap'][data-slide='D5'] { --page: #0f2a26; }
+.slide-kepala .tile-tag { --tag-bg: var(--ds-aksen); --tag-ink: #fff; }
+[data-tema='gelap'] .slide-kepala .tile-tag { --tag-ink: #06130b; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-snap-type: none; }
+    body, header.sticky, .tile { transition: none; }
+}

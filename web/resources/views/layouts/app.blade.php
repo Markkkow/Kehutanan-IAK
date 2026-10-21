@@ -8,6 +8,9 @@
         // Terapkan tema tersimpan sebelum halaman digambar (mencegah kedip)
         try { const t = localStorage.getItem('tema'); if (t) document.documentElement.dataset.tema = t; } catch (e) {}
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     @stack('kepala')
 </head>

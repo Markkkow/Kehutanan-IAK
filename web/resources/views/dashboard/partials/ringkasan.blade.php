@@ -52,29 +52,27 @@
 </div>
 
 {{-- 5 Kartu KPI dengan tema masing-masing dataset (D1–D5) --}}
-<div class="relative z-10 -mt-12 grid grid-cols-1 gap-3 px-2 sm:grid-cols-2 md:px-4 lg:grid-cols-5">
+<div class="relative z-10 -mt-12 grid grid-cols-1 gap-4 px-2 sm:grid-cols-2 md:px-4 lg:grid-cols-5">
     @foreach ($tiles as [$kunci, $ikon, $label, $nilai, $satuan, $catatan, $delta, $kode])
-        <div data-ds="{{ $kode }}" class="kartu flex flex-col p-4 shadow-[0_10px_28px_-12px_rgba(30,25,10,0.28)]">
-            <x-dekor-ds :kode="$kode" />
+        @php $baik = null; if ($delta) { [$v, $teks, $baikNaik] = $delta; $baik = $baikNaik === null ? 'netral' : (($baikNaik ? $v > 0 : $v < 0) ? 'baik' : 'buruk'); } @endphp
+        <div data-ds="{{ $kode }}" class="tile">
             <div class="relative z-10 flex items-start justify-between gap-2">
-                <span class="ikon-ds size-9"><x-ikon :nama="$ikon" class="size-[18px]" /></span>
-                <span class="lencana-ds">{{ $kode }}</span>
+                <span class="tile-tag">{{ $kode }}</span>
+                <x-ikon :nama="$ikon" class="size-6 opacity-80" />
             </div>
-            <div class="relative z-10 mt-2.5 text-[12.5px] font-medium text-ink-2">{{ $label }}</div>
-            <div class="relative z-10 mt-1 text-[26px] leading-none font-bold tabular-nums">
-                {{ $nilai }}<span class="ml-1 text-sm font-normal text-ink-3">{{ $satuan }}</span>
-            </div>
-            <div class="relative z-10 mt-2 min-h-4 text-xs text-ink-3">
+            <div class="tile-judul relative z-10">{{ $label }}</div>
+            <div class="tile-angka relative z-10">{{ $nilai }}<small>{{ $satuan }}</small></div>
+            @if ($kode === 'D2')
+                <div class="tile-seg relative z-10" style="--pct: {{ round((float) $kpi['tutupan']['persen']) }}" role="img" aria-label="{{ F::persen($kpi['tutupan']['persen']) }} daratan"></div>
+            @endif
+            <div class="relative z-10 mt-2 flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                 @if ($delta)
-                    @php [$v, $teks, $baikNaik] = $delta; $baik = $baikNaik === null ? null : ($baikNaik ? $v > 0 : $v < 0); @endphp
-                    <span @class(['inline-flex items-center rounded-md px-1.5 py-0.5 font-semibold', 'bg-brand-lembut text-brand-teks' => $baik === true,
-                        'bg-peringatan-lembut text-peringatan' => $baik === false, 'bg-surface-2 text-ink-2' => $baik === null])>
-                        {{ $v > 0 ? '↑' : '↓' }} {{ F::persen(abs($v), abs($v) >= 10 ? 0 : 1) }}</span>
-                    {{ $teks }}
+                    <span class="tile-delta" data-arah="{{ $baik }}">{{ $v > 0 ? '↑' : '↓' }} {{ F::persen(abs($v), abs($v) >= 10 ? 0 : 1) }}</span>
+                    <span class="tile-ket">{{ $teks }}</span>
                 @endif
-                {{ $catatan }}
+                @if ($catatan)<span class="tile-ket">{{ $catatan }}</span>@endif
             </div>
-            <div class="relative z-10 mt-auto h-9 pt-2"><canvas id="spark-{{ $kunci }}" aria-hidden="true"></canvas></div>
+            <div class="tile-spark relative z-10"><canvas id="spark-{{ $kunci }}" aria-hidden="true"></canvas></div>
         </div>
     @endforeach
 </div>
