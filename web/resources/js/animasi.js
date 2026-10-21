@@ -79,6 +79,72 @@ function animasiGrafik(bab) {
     });
 }
 
+// Latar D3: api "datang" (menyala bertahap) saat bab terbakar masuk layar; pepohonan bergerak beda kecepatan
+function latarApi(bab, { tempel }) {
+    const latar = bab.querySelector('[data-latar-api]');
+    if (!latar) return;
+    const pembuka = bab.querySelector('[data-bab-pembuka]');
+    gsap.fromTo(latar, { '--api': 0 }, {
+        '--api': 1, ease: 'none',
+        scrollTrigger: { trigger: pembuka, start: 'top 90%', end: tempel ? 'top top' : 'top 30%', scrub: 0.8 },
+    });
+    const gulir = { trigger: pembuka, start: 'top bottom', end: 'bottom top', scrub: true };
+    gsap.fromTo(latar.querySelector('.latar-api-dekat'), { yPercent: 10 }, { yPercent: -6, ease: 'none', scrollTrigger: gulir });
+    gsap.fromTo(latar.querySelector('.latar-api-jauh'), { yPercent: 4 }, { yPercent: -2, ease: 'none', scrollTrigger: gulir });
+}
+
+// Bara api: partikel kecil menyala yang naik & bergoyang. Hanya berjalan saat kanvasnya terlihat.
+function baraApi(kanvas) {
+    const ctx = kanvas.getContext('2d');
+    const warna = ['255,190,90', '255,140,50', '255,100,40', '255,220,140'];
+    let partikel = [];
+    let lebar = 0;
+    let tinggi = 0;
+    let jalan = false;
+    const ukur = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        lebar = kanvas.clientWidth;
+        tinggi = kanvas.clientHeight;
+        kanvas.width = lebar * dpr;
+        kanvas.height = tinggi * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    const lahir = () => ({
+        x: Math.random() * lebar, y: tinggi * (0.75 + Math.random() * 0.3), r: 0.8 + Math.random() * 2.2,
+        vy: 0.35 + Math.random() * 1.1, ayun: Math.random() * Math.PI * 2, umur: 0, batas: 160 + Math.random() * 240,
+        w: warna[Math.floor(Math.random() * warna.length)],
+    });
+    const gambar = () => {
+        if (!jalan) return;
+        ctx.clearRect(0, 0, lebar, tinggi);
+        ctx.globalCompositeOperation = 'lighter';
+        while (partikel.length < Math.min(90, lebar / 12)) partikel.push(lahir());
+        partikel = partikel.filter((p) => p.umur < p.batas && p.y > -10);
+        for (const p of partikel) {
+            p.umur += 1;
+            p.y -= p.vy;
+            p.ayun += 0.03;
+            p.x += Math.sin(p.ayun) * 0.45;
+            const a = Math.sin((p.umur / p.batas) * Math.PI); // muncul lalu padam
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+            g.addColorStop(0, `rgba(${p.w},${0.95 * a})`);
+            g.addColorStop(1, `rgba(${p.w},0)`);
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        requestAnimationFrame(gambar);
+    };
+    ukur();
+    window.addEventListener('resize', ukur);
+    new IntersectionObserver(([e]) => {
+        const sebelum = jalan;
+        jalan = e.isIntersecting;
+        if (jalan && !sebelum) requestAnimationFrame(gambar);
+    }).observe(kanvas);
+}
+
 // Penanda bab di kanan: tampil saat bagian Per data terlihat; bar tiap bab terisi sesuai kemajuan baca
 function penandaBab() {
     const rel = document.querySelector('[data-bab-rel]');
@@ -103,6 +169,7 @@ if (daftarBab.length && !window.matchMedia('(prefers-reduced-motion: reduce)').m
     mm.add('(min-width: 1024px)', () => {
         daftarBab.forEach((bab) => {
             animasiPembuka(bab, { tempel: true });
+            latarApi(bab, { tempel: true });
             animasiPembahasan(bab);
             animasiGrafik(bab);
         });
@@ -111,10 +178,12 @@ if (daftarBab.length && !window.matchMedia('(prefers-reduced-motion: reduce)').m
     mm.add('(max-width: 1023px)', () => {
         daftarBab.forEach((bab) => {
             animasiPembuka(bab, { tempel: false });
+            latarApi(bab, { tempel: false });
             animasiGrafik(bab);
         });
     });
     penandaBab();
+    document.querySelectorAll('[data-bara]').forEach(baraApi);
 
     // Posisi pin dihitung ulang setelah font & gambar selesai dimuat
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
