@@ -454,3 +454,420 @@ html {
 [hidden] {
     display: none !important;
 }
+
+/* ==========================================================================
+ * BAB PER DATA (D1–D5): pembuka ala halaman produk, pembahasan bergeser, grafik
+ * Pembuka selalu gelap (seperti panggung), terlepas dari tema terang/gelap.
+ * Warna cahaya tiap bab = warna data versi terang agar kontras di latar gelap.
+ * ========================================================================== */
+[data-bab][data-ds='D1'] { --bab-sinar: #52c788; }
+[data-bab][data-ds='D2'] { --bab-sinar: #8fd66f; }
+[data-bab][data-ds='D3'] { --bab-sinar: #f0805c; }
+[data-bab][data-ds='D4'] { --bab-sinar: #d9a066; }
+[data-bab][data-ds='D5'] { --bab-sinar: #ecb84a; }
+
+html {
+    overflow-x: clip;
+}
+.bab {
+    position: relative;
+    margin-top: 4.5rem;
+}
+
+/* Layar penuh tepi ke tepi: lebar 100vw ditarik keluar dari kolom konten. html memotong luapan horizontal (overflow-x: clip). */
+.bab-pembuka {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    min-height: 100svh;
+    overflow: hidden;
+    padding-block: clamp(5rem, 10vh, 7rem);
+    background: #08110c;
+    color: #f4f7f1;
+}
+.bab-sinar {
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    background:
+        radial-gradient(42% 46% at 72% 62%, color-mix(in srgb, var(--bab-sinar) 55%, transparent), transparent 70%),
+        radial-gradient(30% 34% at 18% 22%, color-mix(in srgb, var(--bab-sinar) 18%, transparent), transparent 70%);
+    filter: blur(28px);
+}
+.bab-pembuka-isi {
+    width: 100%;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 4.5rem);
+    transform-origin: left center;
+}
+.bab-kode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgb(244 247 241 / 0.72);
+}
+.bab-kode span {
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-weight: 700;
+    color: #08110c;
+    background: var(--bab-sinar);
+}
+.bab-judul {
+    margin-top: 1.25rem;
+    font-size: clamp(2.4rem, 6.4vw, 6rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+}
+/* overflow: hidden dibutuhkan animasi kata naik; padding bawah memberi ruang ekor huruf (g, j, p, y) agar tidak terpotong,
+   margin negatif mengembalikan jarak antarbaris seperti semula */
+.bab-judul .kata {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 0.22em;
+    margin-bottom: -0.14em;
+    vertical-align: top;
+}
+.bab-judul .kata > span {
+    display: inline-block;
+}
+.bab-angka {
+    margin-top: clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-size: clamp(3.4rem, 11vw, 9.5rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+}
+.bab-angka > span {
+    /* teks gradien hanya terlukis di dalam kotak elemen; padding bawah agar ekor "j" dan koma tidak terpotong */
+    padding-bottom: 0.14em;
+    background: linear-gradient(100deg, #ffffff 15%, var(--bab-sinar) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.bab-angka small {
+    font-size: 0.3em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgb(244 247 241 / 0.7);
+}
+.bab-ket {
+    margin-top: 1rem;
+    max-width: 44rem;
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    line-height: 1.45;
+    color: rgb(244 247 241 / 0.82);
+}
+.bab-ket span {
+    color: rgb(244 247 241 / 0.5);
+}
+/* petunjuk gulir: garis yang "mengalir" ke bawah */
+.bab-gulir {
+    position: absolute;
+    bottom: 1.75rem;
+    left: 50%;
+    width: 1px;
+    height: 3rem;
+    overflow: hidden;
+    background: rgb(244 247 241 / 0.15);
+}
+.bab-gulir span {
+    display: block;
+    width: 100%;
+    height: 40%;
+    background: var(--bab-sinar);
+    animation: bab-gulir 1.8s ease-in-out infinite;
+}
+@keyframes bab-gulir {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(260%); }
+}
+
+/* Pembahasan: tiga kartu tampil sekaligus (statis). Layar lebar = 3 kolom sejajar, layar kecil = bertumpuk. */
+.bab-slide {
+    margin-top: 1.25rem;
+}
+.bab-slide-jalur {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+@media (min-width: 1024px) {
+    .bab-slide-jalur { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.bab-kartu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+    border-radius: 1.5rem;
+    border: 1px solid var(--garis);
+    border-top: 4px solid var(--ds-aksen);
+    padding: clamp(1.25rem, 2.2vw, 2rem);
+    background: var(--surface);
+}
+.bab-kartu-kepala {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+}
+.bab-kartu-kepala span {
+    font-size: 0.45em;
+    font-weight: 700;
+    color: var(--ds-aksen);
+    font-variant-numeric: tabular-nums;
+}
+.bab-kartu p {
+    font-size: clamp(1rem, 1.15vw, 1.1rem);
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+}
+.bab-slide-kepala {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ds-aksen);
+}
+.bab-grafik {
+    margin-top: 1.25rem;
+}
+
+/* Panel grafik di Per data: bersih tanpa warna data (tanpa garis atas berwarna, ikon/lencana/kotak ringkasan netral) */
+.bab-grafik .kartu[data-ds] {
+    border-color: var(--garis);
+    background-image: none;
+}
+.bab-grafik .ikon-ds,
+.bab-grafik .lencana-ds,
+.bab-grafik .tombol-info {
+    background-color: var(--surface-2);
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--garis);
+}
+.bab-grafik .tombol-info {
+    border-color: var(--garis);
+    box-shadow: none;
+}
+.bab-grafik .ringkas-ds {
+    border-left: 0;
+    border-radius: 0;
+    padding-inline: 0;
+    background: none;
+}
+.bab-grafik .pilih,
+.bab-grafik details.lihat-tabel .isi {
+    border-color: var(--garis);
+}
+.bab-grafik details.lihat-tabel[open] summary {
+    color: var(--ink-2);
+    background-color: var(--surface-2);
+}
+.bab-grafik .tabel-data th {
+    color: var(--ink-3);
+    background-color: var(--surface-2);
+}
+
+/* Penanda bab di kanan: hanya layar lebar, muncul saat bagian Per data terlihat */
+.bab-rel {
+    position: fixed;
+    top: 50%;
+    right: 1.1rem;
+    z-index: 25;
+    display: none;
+    flex-direction: column;
+    gap: 0.55rem;
+    transform: translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+@media (min-width: 1280px) {
+    .bab-rel { display: flex; }
+}
+.bab-rel.tampil {
+    opacity: 1;
+    pointer-events: auto;
+}
+.bab-rel a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--ink-3);
+}
+.bab-rel a b {
+    font-weight: 700;
+}
+.bab-rel-isi {
+    position: relative;
+    width: 3px;
+    height: 2.2rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--garis);
+}
+.bab-rel-isi i {
+    position: absolute;
+    inset: 0;
+    background: var(--ds-aksen);
+    transform: scaleY(0);
+    transform-origin: top;
+}
+.bab-rel a.aktif {
+    color: var(--ds-aksen);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bab-gulir span { animation: none; }
+}
+
+/* ---------- Latar layar penuh tiap bab (SVG + CSS) ---------- */
+.latar {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    --nyala: 1; /* 0 → 1 saat bab masuk layar (diatur GSAP) */
+}
+/* gelapkan sisi kiri agar teks putih selalu terbaca */
+.latar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.25) 45%, transparent 75%);
+}
+.latar-langit { position: absolute; inset: 0; }
+.latar-lapis {
+    position: absolute;
+    left: -4%;
+    width: 108%;
+    bottom: -4%;
+    height: 78%;
+}
+[data-latar='D1'] .latar-langit { background: linear-gradient(to bottom, #061c12 0%, #0e3a26 55%, #2f6b4a 100%); }
+[data-latar='D2'] .latar-langit { background: linear-gradient(to bottom, #0b1d18 0%, #27443a 60%, #6b7a52 100%); }
+[data-latar='D3'] .latar-langit {
+    background:
+        radial-gradient(70% 55% at 50% 100%, rgb(255 120 40 / calc(0.55 * var(--nyala))), transparent 70%),
+        linear-gradient(to bottom, #0a0605 0%, rgb(60 14 6 / calc(0.4 + 0.6 * var(--nyala))) 55%, rgb(150 40 10 / calc(0.85 * var(--nyala))) 100%);
+}
+[data-latar='D4'] .latar-langit { background: linear-gradient(to bottom, #120b06 0%, #3b2412 60%, #8a5a2c 100%); }
+[data-latar='D5'] .latar-langit { background: linear-gradient(to bottom, #15100a 0%, #4a3412 55%, #b8862e 100%); }
+
+/* kabut hutan hujan (D1) & debu lahan gundul (D5): pita kabur yang bergeser pelan */
+.latar-kabut, .latar-debu { position: absolute; inset: 0; }
+.latar-kabut i, .latar-debu i {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    height: 22%;
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: kabut 26s ease-in-out infinite alternate;
+}
+.latar-kabut i { background: radial-gradient(closest-side, rgb(210 235 220 / 0.22), transparent); }
+.latar-kabut i:nth-child(1) { top: 48%; }
+.latar-kabut i:nth-child(2) { top: 62%; animation-duration: 34s; animation-delay: -10s; }
+.latar-debu i { background: radial-gradient(closest-side, rgb(230 190 120 / 0.25), transparent); }
+.latar-debu i:nth-child(1) { top: 50%; }
+.latar-debu i:nth-child(2) { top: 66%; animation-duration: 30s; animation-delay: -8s; }
+@keyframes kabut {
+    from { transform: translateX(-6%); }
+    to { transform: translateX(6%); }
+}
+
+/* D3: asap, garis api, lidah api, bara */
+.latar-asap { position: absolute; inset: 0; opacity: calc(0.25 + 0.55 * var(--nyala)); }
+.latar-asap i {
+    position: absolute;
+    bottom: 10%;
+    width: 60%;
+    height: 70%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(90 60 50 / 0.45), transparent);
+    filter: blur(30px);
+    animation: asap 18s linear infinite;
+}
+.latar-asap i:nth-child(1) { left: -10%; }
+.latar-asap i:nth-child(2) { left: 25%; animation-delay: -6s; animation-duration: 22s; }
+.latar-asap i:nth-child(3) { left: 55%; animation-delay: -12s; animation-duration: 20s; }
+@keyframes asap {
+    from { transform: translate(0, 20%) scale(0.9); opacity: 0; }
+    20% { opacity: 1; }
+    to { transform: translate(8%, -45%) scale(1.3); opacity: 0; }
+}
+.latar-nyala {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    bottom: 6%;
+    height: 38%;
+    background:
+        radial-gradient(22% 60% at 20% 100%, rgb(255 170 60 / 0.9), transparent 70%),
+        radial-gradient(18% 55% at 52% 100%, rgb(255 110 30 / 0.85), transparent 70%),
+        radial-gradient(24% 65% at 82% 100%, rgb(255 150 50 / 0.9), transparent 70%);
+    filter: blur(16px);
+    opacity: var(--nyala);
+    mix-blend-mode: screen;
+    animation: kedip-api 2.6s ease-in-out infinite alternate;
+}
+@keyframes kedip-api {
+    0% { transform: scaleY(0.85); }
+    50% { transform: scaleY(1.08); }
+    100% { transform: scaleY(0.95); }
+}
+.latar-lidah {
+    position: absolute;
+    left: -4%;
+    width: 108%;
+    bottom: -4%;
+    height: 78%;
+    opacity: var(--nyala);
+    filter: blur(2px);
+}
+.latar-lidah .lidah {
+    fill: rgb(255 140 40 / 0.85);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: lidah 1.4s ease-in-out infinite alternate;
+    animation-delay: calc(var(--n) * -0.37s);
+    mix-blend-mode: screen;
+}
+@keyframes lidah {
+    0% { transform: scale(0.9, 0.8) skewX(-4deg); fill: rgb(255 120 30 / 0.8); }
+    50% { transform: scale(1.05, 1.1) skewX(3deg); fill: rgb(255 170 60 / 0.9); }
+    100% { transform: scale(0.95, 0.95) skewX(-2deg); fill: rgb(255 200 90 / 0.85); }
+}
+.latar-bara { position: absolute; inset: 0; width: 100%; height: 100%; opacity: var(--nyala); }
+
+/* cahaya warna bab diredam karena latar sudah bercerita */
+[data-bab] .bab-sinar { opacity: 0.35; }
+[data-bab] .bab-pembuka-isi { text-shadow: 0 2px 30px rgb(0 0 0 / 0.45); }
+
+@media (prefers-reduced-motion: reduce) {
+    .latar-kabut i, .latar-debu i, .latar-asap i, .latar-nyala, .latar-lidah .lidah { animation: none; }
+}

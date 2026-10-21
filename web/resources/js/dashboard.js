@@ -7,6 +7,7 @@
  * label langsung hanya di titik penting; setiap grafik punya tabel data pendamping. Grafik baru dibuat saat panelnya terlihat (lazy).
  */
 import Chart from 'chart.js/auto';
+import './animasi';
 
 const D = window.DATA;
 const html = document.documentElement;
@@ -63,7 +64,9 @@ function terapkanGayaDasar() {
     Chart.defaults.color = W.tinta3;
     Chart.defaults.borderColor = W.kisi;
     Chart.defaults.maintainAspectRatio = false;
-    Chart.defaults.animation.duration = 450;
+    // grafik "tergambar" saat muncul; mati bila pengguna meminta gerak dikurangi
+    Chart.defaults.animation.duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900;
+    Chart.defaults.animation.easing = 'easeOutQuart';
     Object.assign(Chart.defaults.plugins.legend, { position: 'top', align: 'start' });
     Object.assign(Chart.defaults.plugins.legend.labels, {
         usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 10, boxHeight: 10, color: W.tinta2, padding: 14,
