@@ -23,7 +23,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 // Vercel: sistem file hanya-baca kecuali /tmp, jadi storage (log, cache, view terkompilasi) dipindah ke sana.
-if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || getenv('VERCEL')) {
+if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || getenv('VERCEL') || str_starts_with(__DIR__, '/var/task') || ! is_writable(dirname(__DIR__).'/storage')) {
     $storage = '/tmp/storage';
     foreach (['app', 'framework/cache/data', 'framework/sessions', 'framework/views', 'logs'] as $sub) {
         if (! is_dir("$storage/$sub")) {
