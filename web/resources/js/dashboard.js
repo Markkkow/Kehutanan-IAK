@@ -571,15 +571,47 @@ const pengamatMenu = new IntersectionObserver((entri) => entri.forEach((e) => {
 }), { rootMargin: '-40% 0px -55% 0px' });
 document.querySelectorAll('[data-panel]').forEach((s) => pengamatMenu.observe(s));
 
-// latar halaman berganti mengikuti slide data (D1–D5) yang sedang di tengah layar; di luar bagian per-data, latar kembali normal
 const akar = document.documentElement;
-const pengamatSlide = new IntersectionObserver((entri) => entri.forEach((e) => {
-    if (e.isIntersecting) akar.dataset.slide = e.target.dataset.slide;
-}), { rootMargin: '-45% 0px -50% 0px' });
-document.querySelectorAll('[data-slide]').forEach((s) => pengamatSlide.observe(s));
-document.querySelectorAll('[data-panel]:not(#per-data)').forEach((s) => new IntersectionObserver((entri) => entri.forEach((e) => {
-    if (e.isIntersecting) delete akar.dataset.slide;
-}), { rootMargin: '-40% 0px -55% 0px' }).observe(s));
+
+// ================================================================== per data: panggung scroll (layar menempel, adegan & latar mengikuti scroll)
+// Tiap .trek (300vh) berisi panggung sticky. Progres 0 -> 1 ditulis ke --p; latar halaman dicampur antar-data di akhir tiap lintasan.
+const LATAR = {
+    terang: ['#cfe8d6', '#dcedb4', '#e6ead0', '#d9e0ae', '#c8e3d5'],
+    gelap: ['#0f2a1b', '#15301a', '#2a2418', '#222915', '#0f2a26'],
+};
+const LATAR_AWAL = { terang: '#f2eee3', gelap: '#0e1a13' };
+const trek = [...document.querySelectorAll('.trek')];
+const gerakPenuh = () => !matchMedia('(max-width: 1023px), (max-height: 680px), (prefers-reduced-motion: reduce)').matches;
+let menunggu = false;
+function perbaruiTrek() {
+    menunggu = false;
+    if (!trek.length) return;
+    if (!gerakPenuh()) { akar.style.removeProperty('--page'); trek.forEach((t) => t.style.removeProperty('--p')); return; }
+    const tinggi = window.innerHeight;
+    const palet = LATAR[akar.dataset.tema === 'terang' ? 'terang' : 'gelap'];
+    const awal = LATAR_AWAL[akar.dataset.tema === 'terang' ? 'terang' : 'gelap'];
+    let warna = null;
+    trek.forEach((t, i) => {
+        const r = t.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - tinggi)));
+        t.style.setProperty('--p', p.toFixed(4));
+        if (r.top > tinggi || r.bottom < 0) return;
+        if (r.top <= 0 && r.bottom >= tinggi * 0.5) {
+            const ke = palet[Math.min(i + 1, palet.length - 1)];
+            const w = Math.min(1, Math.max(0, (p - 0.7) / 0.3));
+            warna = i + 1 < palet.length && w > 0 ? `color-mix(in srgb, ${ke} ${(w * 100).toFixed(1)}%, ${palet[i]})` : palet[i];
+        } else if (i === 0 && r.top > 0) {
+            const w = Math.min(1, Math.max(0, 1 - r.top / tinggi));
+            warna = `color-mix(in srgb, ${palet[0]} ${(w * 100).toFixed(1)}%, ${awal})`;
+        }
+    });
+    if (warna) akar.style.setProperty('--page', warna); else akar.style.removeProperty('--page');
+}
+const jadwalkan = () => { if (!menunggu) { menunggu = true; requestAnimationFrame(perbaruiTrek); } };
+window.addEventListener('scroll', jadwalkan, { passive: true });
+window.addEventListener('resize', jadwalkan);
+new MutationObserver(jadwalkan).observe(akar, { attributes: true, attributeFilter: ['data-tema'] });
+perbaruiTrek();
 
 // ================================================================== per data: pilihan tahun peringkat provinsi
 [['pilihTahunKarhutla', 'chartKarhutlaProvinsi'], ['pilihTahunKayu', 'chartKayuProvinsi']].forEach(([sel, id]) =>

@@ -558,29 +558,68 @@ html {
         background: var(--deko); border: 2px solid var(--tile-line); transform: rotate(-38deg);
     }
 
-    /* Slide per data: kepala menempel, latar halaman berganti halus */
-    .slide { @apply scroll-mt-[4.5rem] pt-10 pb-16; min-height: calc(100dvh - 4.5rem); scroll-snap-align: start; }
-    .slide-kepala { @apply sticky top-[4.4rem] z-20 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl px-1 py-2; }
-    .slide-kepala h2 { font-family: var(--font-tampil); @apply text-2xl font-extrabold md:text-3xl; letter-spacing: -0.02em; }
-    .slide-kepala p { @apply basis-full text-[13px] text-ink-2 md:basis-auto; }
 }
 
-html { scroll-snap-type: y proximity; }
-body { transition: background-color 0.7s ease; }
-header.sticky { transition: background-color 0.7s ease; }
-html[data-slide='D1'] { --page: #d3ead9; }
-html[data-slide='D2'] { --page: #e0efbd; }
-html[data-slide='D3'] { --page: #e3ecd2; }
-html[data-slide='D4'] { --page: #d8e2b6; }
-html[data-slide='D5'] { --page: #cfe6da; }
-html[data-tema='gelap'][data-slide='D1'] { --page: #0f2a1b; }
-html[data-tema='gelap'][data-slide='D2'] { --page: #15301a; }
-html[data-tema='gelap'][data-slide='D3'] { --page: #1a281b; }
-html[data-tema='gelap'][data-slide='D4'] { --page: #222915; }
-html[data-tema='gelap'][data-slide='D5'] { --page: #0f2a26; }
-.slide-kepala .tile-tag { --tag-bg: var(--ds-aksen); --tag-ink: #fff; }
-[data-tema='gelap'] .slide-kepala .tile-tag { --tag-ink: #06130b; }
-@media (prefers-reduced-motion: reduce) {
-    html { scroll-snap-type: none; }
-    body, header.sticky, .tile { transition: none; }
+
+/* ==========================================================================
+ * PANGGUNG SCROLL (per data): layar menempel, adegan & latar bergerak mengikuti scroll (var --p: 0 -> 1)
+ * Tiap data = satu "lintasan" tinggi; panggung di dalamnya sticky. Di layar kecil / gerak dikurangi: tanpa menempel.
+ * ========================================================================== */
+.trek { position: relative; height: 300vh; --p: 0; }
+.panggung {
+    position: sticky; top: 0; height: 100dvh; overflow: hidden;
+    padding-top: 4.6rem; display: flex; flex-direction: column; justify-content: center;
 }
+.adegan {
+    position: absolute; inset: 4.6rem 0 0 0; display: grid; place-content: center; text-align: center; padding: 0 1rem;
+    opacity: clamp(0, calc(1 - (var(--p) - 0.3) * 6), 1);
+    transform: translateY(calc(clamp(0, (var(--p) - 0.3) * 6, 1) * -40px));
+    pointer-events: none;
+}
+.adegan h2 { font-family: var(--font-tampil); font-weight: 800; letter-spacing: -0.03em; font-size: clamp(2rem, 6vw, 4.5rem); line-height: 1.02; text-wrap: balance; }
+.adegan p { margin: 0.9rem auto 0; max-width: 34rem; font-size: clamp(0.95rem, 1.6vw, 1.2rem); color: var(--ink-2); }
+.adegan .tile-tag { justify-self: center; margin-bottom: 1rem; }
+.pemandangan { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.pemandangan i { position: absolute; display: block; background: var(--deko, var(--brand)); opacity: 0.85; }
+.isi-data {
+    position: relative; margin: 0 auto; width: 100%; max-width: 1360px; padding: 0 1.5rem; max-height: calc(100dvh - 6rem); overflow: auto;
+    opacity: clamp(0, calc((var(--p) - 0.4) * 5), 1);
+    transform: translateY(calc((1 - clamp(0, (var(--p) - 0.4) * 4, 1)) * 70px));
+}
+.isi-data .kepala-data { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; margin-bottom: 0.9rem; }
+.isi-data .kepala-data h3 { font-family: var(--font-tampil); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.4rem, 3vw, 2rem); }
+.isi-data .kepala-data p { font-size: 13px; color: var(--ink-2); }
+
+/* pohon: tumbuh (D1) atau menghilang (D5) mengikuti scroll; --d = jeda tiap pohon */
+.pemandangan.pohon i { bottom: 0; left: var(--x); width: calc(var(--s) * 74px); height: calc(var(--s) * 120px); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
+.pemandangan.tumbuh i { transform: scaleY(clamp(0.05, calc(var(--p) * 3.2 - var(--d)), 1)); }
+.pemandangan.hilang i { transform: scaleY(clamp(0.04, calc(1.25 - (var(--p) * 3.2 - var(--d))), 1)); }
+/* lingkaran: tutupan meluas (D2) / lingkar kayu (D4) */
+.pemandangan.meluas i { left: 50%; top: 58%; border-radius: 50%; translate: -50% -50%; width: calc((18vmin + var(--p) * 110vmin) * var(--s)); aspect-ratio: 1; opacity: calc(0.32 / var(--s)); }
+.pemandangan.cincin i { left: 50%; top: 58%; border-radius: 50%; translate: -50% -50%; background: transparent; border: 3px solid var(--deko); width: calc((14vmin + var(--p) * 70vmin) * var(--s)); aspect-ratio: 1; }
+/* bara api naik (D3) */
+.pemandangan.bara i { bottom: -12px; left: var(--x); width: calc(var(--s) * 10px); aspect-ratio: 1; border-radius: 50%; opacity: clamp(0, calc(1.1 - var(--p) * 2.2), 0.9); transform: translateY(calc(var(--p) * var(--v) * -95vh)); }
+
+@media (max-width: 1023px), (max-height: 680px), (prefers-reduced-motion: reduce) {
+    .trek { height: auto; padding: 2rem 0 2.5rem; }
+    .panggung { position: static; height: auto; overflow: visible; padding-top: 0; }
+    .adegan { position: static; inset: auto; opacity: 1; transform: none; padding: 0 0 1rem; text-align: left; place-content: start; }
+    .adegan h2 { font-size: 1.7rem; }
+    .adegan p, .pemandangan { display: none; }
+    .adegan .tile-tag { justify-self: start; margin-bottom: 0.5rem; }
+    .isi-data { opacity: 1; transform: none; max-height: none; overflow: visible; padding: 0; }
+    .isi-data .kepala-data { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { body, header.sticky, .tile { transition: none; } }
+
+/* warna adegan per data (cincin, bara, pohon) */
+.trek[data-ds='D1'] { --deko: #1d6b43; }
+.trek[data-ds='D2'] { --deko: #2f7d4f; }
+.trek[data-ds='D3'] { --deko: #c0502e; }
+.trek[data-ds='D4'] { --deko: #9c5a1f; }
+.trek[data-ds='D5'] { --deko: #3b8a5a; }
+[data-tema='gelap'] .trek[data-ds='D1'] { --deko: #52c788; }
+[data-tema='gelap'] .trek[data-ds='D2'] { --deko: #8fd36b; }
+[data-tema='gelap'] .trek[data-ds='D3'] { --deko: #e87052; }
+[data-tema='gelap'] .trek[data-ds='D4'] { --deko: #d49252; }
+[data-tema='gelap'] .trek[data-ds='D5'] { --deko: #52c788; }
