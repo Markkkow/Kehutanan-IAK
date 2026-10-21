@@ -574,10 +574,10 @@ document.querySelectorAll('[data-panel]').forEach((s) => pengamatMenu.observe(s)
 const akar = document.documentElement;
 
 // ================================================================== per data: panggung scroll (layar menempel, adegan & latar mengikuti scroll)
-// Tiap .trek (300vh) berisi panggung sticky. Progres 0 -> 1 ditulis ke --p; latar halaman dicampur antar-data di akhir tiap lintasan.
+// Tiap .trek berisi panggung sticky. --m (0 -> 1) = panggung masuk dari bawah, --p (0 -> 1) = lintasan menempel; latar halaman dicampur antar-data di akhir tiap lintasan.
 const LATAR = {
-    terang: ['#cfe8d6', '#dcedb4', '#e6ead0', '#d9e0ae', '#c8e3d5'],
-    gelap: ['#0f2a1b', '#15301a', '#2a2418', '#222915', '#0f2a26'],
+    terang: ['#cfe8d6', '#dcedb4', '#3c0008', '#d9e0ae', '#c8e3d5'],
+    gelap: ['#0f2a1b', '#15301a', '#3c0008', '#222915', '#0f2a26'],
 };
 const LATAR_AWAL = { terang: '#f2eee3', gelap: '#0e1a13' };
 const trek = [...document.querySelectorAll('.trek')];
@@ -586,32 +586,74 @@ let menunggu = false;
 function perbaruiTrek() {
     menunggu = false;
     if (!trek.length) return;
-    if (!gerakPenuh()) { akar.style.removeProperty('--page'); trek.forEach((t) => t.style.removeProperty('--p')); return; }
+    if (!gerakPenuh()) { akar.style.removeProperty('--page'); delete akar.dataset.latar; trek.forEach((t) => { t.style.removeProperty('--p'); t.style.removeProperty('--m'); }); return; }
     const tinggi = window.innerHeight;
     const palet = LATAR[akar.dataset.tema === 'terang' ? 'terang' : 'gelap'];
     const awal = LATAR_AWAL[akar.dataset.tema === 'terang' ? 'terang' : 'gelap'];
     let warna = null;
+    let indeksLatar = -1; // palet yang sedang dominan (untuk menandai latar maroon)
     trek.forEach((t, i) => {
         const r = t.getBoundingClientRect();
         const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - tinggi)));
         t.style.setProperty('--p', p.toFixed(4));
+        t.style.setProperty('--m', Math.min(1, Math.max(0, (tinggi - r.top) / (tinggi * 0.6))).toFixed(3));
         if (r.top > tinggi || r.bottom < 0) return;
-        if (r.top <= 0 && r.bottom >= tinggi * 0.5) {
-            const ke = palet[Math.min(i + 1, palet.length - 1)];
+        if (r.top <= 0 && r.bottom > 0) {
+            const terakhir = i + 1 >= palet.length;
             const w = Math.min(1, Math.max(0, (p - 0.55) / 0.45));
-            warna = i + 1 < palet.length && w > 0 ? `color-mix(in srgb, ${ke} ${(w * 100).toFixed(1)}%, ${palet[i]})` : palet[i];
+            if (!terakhir) {
+                // setelah lintasan selesai (p = 1) latar tetap warna data berikutnya sampai panggung berikutnya menempel
+                warna = w > 0 ? `color-mix(in srgb, ${palet[i + 1]} ${(w * 100).toFixed(1)}%, ${palet[i]})` : palet[i];
+                indeksLatar = w > 0.5 ? i + 1 : i;
+            } else {
+                // data terakhir: saat panggung terlepas, latar kembali ke warna halaman biasa
+                const kembali = Math.min(1, Math.max(0, 1 - r.bottom / tinggi));
+                warna = kembali > 0 ? `color-mix(in srgb, ${awal} ${(kembali * 100).toFixed(1)}%, ${palet[i]})` : palet[i];
+                indeksLatar = kembali > 0.5 ? -1 : i;
+            }
         } else if (i === 0 && r.top > 0) {
             const w = Math.min(1, Math.max(0, 1 - r.top / tinggi));
             warna = `color-mix(in srgb, ${palet[0]} ${(w * 100).toFixed(1)}%, ${awal})`;
         }
     });
     if (warna) akar.style.setProperty('--page', warna); else akar.style.removeProperty('--page');
+    if (indeksLatar === 2) akar.dataset.latar = 'gelap'; else delete akar.dataset.latar;
 }
 const jadwalkan = () => { if (!menunggu) { menunggu = true; requestAnimationFrame(perbaruiTrek); } };
 window.addEventListener('scroll', jadwalkan, { passive: true });
 window.addEventListener('resize', jadwalkan);
 new MutationObserver(jadwalkan).observe(akar, { attributes: true, attributeFilter: ['data-tema'] });
 perbaruiTrek();
+
+// Scroll snapping D1 -> D2 -> ... : setelah scroll berhenti, layar meluncur ke titik berikutnya (panel terlihat penuh) menurut arah scroll.
+// Hanya aktif di antara titik D1 dan D5; di luar itu scroll bebas. Berlaku untuk roda mouse, touchpad, keyboard, dan seret scrollbar.
+const jangkar = trek.map((t) => t.querySelector('.jangkar')).filter(Boolean);
+let awalScroll = window.scrollY;
+let targetOtomatis = null;
+let timerBerhenti = null;
+function titikHenti() { return jangkar.map((j) => Math.round(j.getBoundingClientRect().top + window.scrollY)); }
+function setelahBerhenti() {
+    timerBerhenti = null;
+    const y = window.scrollY;
+    const titik = titikHenti();
+    let mulai = awalScroll;
+    if (targetOtomatis !== null) { mulai = targetOtomatis; targetOtomatis = null; if (Math.abs(y - mulai) < 4) { awalScroll = y; return; } }
+    awalScroll = y;
+    if (!gerakPenuh() || titik.length < 2 || y < titik[0] - 3 || y > titik[titik.length - 1] + 3) return;
+    if (titik.some((t) => Math.abs(t - y) < 4)) return;
+    const arah = Math.sign(y - mulai);
+    if (!arah) return;
+    const kandidat = arah > 0 ? titik.filter((t) => t > mulai + 3) : titik.filter((t) => t < mulai - 3);
+    if (!kandidat.length) return;
+    const tujuan = kandidat.reduce((a, b) => (Math.abs(b - y) < Math.abs(a - y) ? b : a));
+    targetOtomatis = tujuan;
+    awalScroll = tujuan;
+    window.scrollTo({ top: tujuan, behavior: 'smooth' });
+}
+window.addEventListener('scroll', () => {
+    clearTimeout(timerBerhenti);
+    timerBerhenti = setTimeout(setelahBerhenti, 140);
+}, { passive: true });
 
 // ================================================================== per data: pilihan tahun peringkat provinsi
 [['pilihTahunKarhutla', 'chartKarhutlaProvinsi'], ['pilihTahunKayu', 'chartKayuProvinsi']].forEach(([sel, id]) =>

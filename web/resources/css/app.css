@@ -259,9 +259,7 @@
 
     /* Kotak ringkasan temuan di bawah grafik */
     .ringkas-ds {
-        @apply mt-3 rounded-xl border-l-[3px] px-3 py-2 text-[12.5px] leading-snug text-pretty text-ink-2;
-        border-left-color: var(--ds-aksen);
-        background-color: color-mix(in srgb, var(--ds-lembut) 48%, var(--surface-2));
+        @apply mt-3 rounded-xl border border-garis px-3 py-2 text-[12.5px] leading-snug text-pretty text-ink-2;
     }
 
     .kartu-judul {
@@ -561,52 +559,72 @@ html {
  * PANGGUNG SCROLL (per data): panel visualisasi menempel; latar bergerak mengikuti scroll (var --p: 0 -> 1).
  * Tanpa teks penghubung: D1 langsung ke D2. Di layar kecil / gerak dikurangi: tanpa menempel.
  * ========================================================================== */
-.trek { position: relative; height: 200vh; --p: 0; }
+.trek { position: relative; --tt: 180vh; height: var(--tt); --p: 0; --m: 1; }
 .panggung {
     position: sticky; top: 0; height: 100dvh; overflow: hidden;
     padding-top: 4.6rem; display: flex; flex-direction: column; justify-content: center;
 }
+/* titik henti scroll (snap, diatur JS): tepat saat panel data terlihat penuh (p = 0.5) */
+.jangkar { position: absolute; left: 0; top: calc((var(--tt) - 100dvh) / 2); width: 1px; height: 1px; pointer-events: none; }
 .latar-adegan { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 .pemandangan { position: absolute; inset: 0; }
 .pemandangan i { position: absolute; display: block; background-color: var(--deko, var(--brand)); opacity: 0.85; }
 .isi-data {
     position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 1360px; padding: 0 1.5rem; max-height: calc(100dvh - 6rem); overflow: auto;
-    /* masuk di awal lintasan, keluar di akhir (halus), langsung ke panel data berikutnya */
-    opacity: clamp(0, min(calc(var(--p) * 12), calc((1 - var(--p)) * 12)), 1);
-    transform: translateY(calc((1 - clamp(0, var(--p) * 10, 1)) * 56px - clamp(0, (var(--p) - 0.9) * 10, 1) * 56px));
+    /* --m: panggung sedang masuk dari bawah (0 -> 1); --p: lintasan menempel (0 -> 1). Panel muncul sejak panggung masuk, memudar di akhir lintasan */
+    opacity: clamp(0, min(var(--m), calc((1 - var(--p)) * 12)), 1);
+    transform: translateY(calc((1 - var(--m)) * 56px - clamp(0, (var(--p) - 0.9) * 10, 1) * 56px));
 }
 
-/* pohon (siluet): tumbuh (D1) atau menghilang (D5) mengikuti scroll; --d = jeda tiap pohon */
+/* pohon (siluet hitam): naik dari batas bawah (D1) atau turun ke batas bawah (D5), tanpa mulur; --d = jeda tiap pohon */
 .pemandangan.pohon i {
     bottom: 0; left: var(--x); width: calc(var(--s) * 100px); height: calc(var(--s) * 140px);
-    background: center bottom / contain no-repeat; opacity: 0.92; transform-origin: 50% 100%;
+    background: center bottom / contain no-repeat; opacity: 0.92;
 }
 .pemandangan.pohon i:nth-child(4n + 1) { background-image: url('../img/pohon1.webp'); }
 .pemandangan.pohon i:nth-child(4n + 2) { background-image: url('../img/pohon2.webp'); }
 .pemandangan.pohon i:nth-child(4n + 3) { background-image: url('../img/pohon3.webp'); }
 .pemandangan.pohon i:nth-child(4n + 4) { background-image: url('../img/pohon4.webp'); }
 [data-tema='gelap'] .pemandangan.pohon i { filter: invert(1); opacity: 0.22; }
-.pemandangan.tumbuh i { transform: scaleY(clamp(0.05, calc(var(--p) * 3.2 - var(--d)), 1)); }
-.pemandangan.hilang i { transform: scaleY(clamp(0.04, calc(1.25 - (var(--p) * 3.2 - var(--d))), 1)); }
+.pemandangan.tumbuh i { transform: translateY(calc((1 - clamp(0, var(--p) * 5 - var(--d), 1)) * 100%)); }
+.pemandangan.hilang i { transform: translateY(calc(clamp(0, (var(--p) - 0.5) * 5 - var(--d), 1) * 100%)); }
 /* lingkar kayu (D4) */
 .pemandangan.cincin i { left: 50%; top: 58%; border-radius: 50%; translate: -50% -50%; background: transparent; border: 3px solid var(--deko); width: calc((14vmin + var(--p) * 70vmin) * var(--s)); aspect-ratio: 1; }
-/* bara api naik dari bawah terus-menerus (D3) */
-.pemandangan.bara i { bottom: -12px; left: var(--x); width: calc(var(--s) * 10px); aspect-ratio: 1; border-radius: 50%; opacity: 0; animation: bara-naik calc(5s + var(--v) * 4s) linear infinite; animation-delay: calc(var(--t) * -1s); }
+
+/* kebakaran (D3): latar maroon, pohon hitam diam di belakang, titik api oranye -> kuning naik terus-menerus */
+.trek[data-ds='D3'] .latar-adegan::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 75% 42% at 50% 100%, rgba(255, 110, 20, 0.5), rgba(255, 60, 0, 0.16) 55%, transparent 78%);
+}
+.trek[data-ds='D3'] .pemandangan.pohon i,
+[data-tema='gelap'] .trek[data-ds='D3'] .pemandangan.pohon i { filter: none; opacity: 0.88; transform: none; }
+.pemandangan.bara i {
+    bottom: -14px; left: var(--x); width: calc(var(--s) * 10px); aspect-ratio: 1; border-radius: 50%;
+    background-color: var(--c); box-shadow: 0 0 calc(var(--s) * 9px) var(--c); opacity: 0;
+    animation: bara-naik calc(5s + var(--v) * 4s) linear infinite; animation-delay: calc(var(--t) * -1s);
+}
 @keyframes bara-naik {
     0% { transform: translate(0, 0); opacity: 0; }
-    10% { opacity: 0.9; }
-    70% { opacity: 0.55; }
-    100% { transform: translate(calc(var(--v) * 24px - 12px), -88vh); opacity: 0; }
+    10% { opacity: 0.95; }
+    70% { opacity: 0.6; }
+    100% { transform: translate(calc(var(--v) * 30px - 15px), calc(var(--v) * -52vh - 36vh)); opacity: 0; }
 }
-/* bumi (D2): foto bumi dengan cahaya biru; berputar dan sedikit membesar mengikuti scroll */
+/* bumi (D2): foto bumi dengan cahaya biru; berputar pelan dan sedikit membesar mengikuti scroll */
 .bumi-img {
-    position: absolute; left: 50%; top: 58%; width: min(120vmin, 1050px); aspect-ratio: 1; translate: -50% -50%;
+    position: absolute; left: 50%; top: 56%; width: min(78vmin, 700px); aspect-ratio: 1; translate: -50% -50%;
     background: url('../img/bumi.webp') center / contain no-repeat;
-    transform: scale(calc(0.82 + var(--p) * 0.28)) rotate(calc(var(--p) * 16deg));
+    transform: scale(calc(0.88 + var(--p) * 0.2)) rotate(calc(var(--p) * 16deg));
+}
+
+/* header ikut terang saat latar halaman maroon (tema terang) */
+:root[data-tema='terang'][data-latar='gelap'] header.sticky {
+    --ink: #ecf0e4; --ink-2: #d8c9c4; --ink-3: #b99a98; --garis: rgba(255, 220, 210, 0.16); --surface: #3c0008; --surface-2: #4a0a12;
+    color: var(--ink); color-scheme: dark;
 }
 
 @media (max-width: 1023px), (max-height: 680px), (prefers-reduced-motion: reduce) {
     .trek { height: auto; padding: 1.25rem 0; }
+    .jangkar { display: none; }
     .panggung { position: static; height: auto; overflow: visible; padding-top: 0; }
     .latar-adegan { display: none; }
     .isi-data { opacity: 1; transform: none; max-height: none; overflow: visible; padding: 0; }
