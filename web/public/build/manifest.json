@@ -1,12 +1,39 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-Cp99qqz3.css",
+    "file": "assets/app-C8F1Z_37.css",
     "name": "app",
     "names": [
       "app.css"
     ],
     "src": "resources/css/app.css",
-    "isEntry": true
+    "isEntry": true,
+    "assets": [
+      "assets/pohon1-CkgM0zSt.webp",
+      "assets/pohon2-Cmq0Y1Rn.webp",
+      "assets/pohon3-DGF_IEON.webp",
+      "assets/pohon4-BnwYIcGc.webp",
+      "assets/bumi-BkScNkbL.webp"
+    ]
+  },
+  "resources/img/bumi.webp": {
+    "file": "assets/bumi-BkScNkbL.webp",
+    "src": "resources/img/bumi.webp"
+  },
+  "resources/img/pohon1.webp": {
+    "file": "assets/pohon1-CkgM0zSt.webp",
+    "src": "resources/img/pohon1.webp"
+  },
+  "resources/img/pohon2.webp": {
+    "file": "assets/pohon2-Cmq0Y1Rn.webp",
+    "src": "resources/img/pohon2.webp"
+  },
+  "resources/img/pohon3.webp": {
+    "file": "assets/pohon3-DGF_IEON.webp",
+    "src": "resources/img/pohon3.webp"
+  },
+  "resources/img/pohon4.webp": {
+    "file": "assets/pohon4-BnwYIcGc.webp",
+    "src": "resources/img/pohon4.webp"
   },
   "resources/js/dashboard.js": {
     "file": "assets/dashboard-BKd_H06g.js",

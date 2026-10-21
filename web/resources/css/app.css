@@ -568,7 +568,7 @@ html {
 }
 .latar-adegan { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 .pemandangan { position: absolute; inset: 0; }
-.pemandangan i { position: absolute; display: block; background: var(--deko, var(--brand)); opacity: 0.85; }
+.pemandangan i { position: absolute; display: block; background-color: var(--deko, var(--brand)); opacity: 0.85; }
 .isi-data {
     position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 1360px; padding: 0 1.5rem; max-height: calc(100dvh - 6rem); overflow: auto;
     /* masuk di awal lintasan, keluar di akhir (halus), langsung ke panel data berikutnya */
@@ -576,8 +576,16 @@ html {
     transform: translateY(calc((1 - clamp(0, var(--p) * 10, 1)) * 56px - clamp(0, (var(--p) - 0.9) * 10, 1) * 56px));
 }
 
-/* pohon: tumbuh (D1) atau menghilang (D5) mengikuti scroll; --d = jeda tiap pohon */
-.pemandangan.pohon i { bottom: 0; left: var(--x); width: calc(var(--s) * 74px); height: calc(var(--s) * 120px); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
+/* pohon (siluet): tumbuh (D1) atau menghilang (D5) mengikuti scroll; --d = jeda tiap pohon */
+.pemandangan.pohon i {
+    bottom: 0; left: var(--x); width: calc(var(--s) * 100px); height: calc(var(--s) * 140px);
+    background: center bottom / contain no-repeat; opacity: 0.92; transform-origin: 50% 100%;
+}
+.pemandangan.pohon i:nth-child(4n + 1) { background-image: url('../img/pohon1.webp'); }
+.pemandangan.pohon i:nth-child(4n + 2) { background-image: url('../img/pohon2.webp'); }
+.pemandangan.pohon i:nth-child(4n + 3) { background-image: url('../img/pohon3.webp'); }
+.pemandangan.pohon i:nth-child(4n + 4) { background-image: url('../img/pohon4.webp'); }
+[data-tema='gelap'] .pemandangan.pohon i { filter: invert(1); opacity: 0.22; }
 .pemandangan.tumbuh i { transform: scaleY(clamp(0.05, calc(var(--p) * 3.2 - var(--d)), 1)); }
 .pemandangan.hilang i { transform: scaleY(clamp(0.04, calc(1.25 - (var(--p) * 3.2 - var(--d))), 1)); }
 /* lingkar kayu (D4) */
@@ -590,9 +598,12 @@ html {
     70% { opacity: 0.55; }
     100% { transform: translate(calc(var(--v) * 24px - 12px), -88vh); opacity: 0; }
 }
-/* bumi (D2): berputar dan sedikit membesar mengikuti scroll */
-.bumi-svg { position: absolute; left: 50%; top: 58%; width: min(115vmin, 1100px); translate: -50% -50%; transform: scale(calc(0.8 + var(--p) * 0.3)); }
-.bumi-darat { transform: translateX(calc(var(--p) * -230px)); }
+/* bumi (D2): foto bumi dengan cahaya biru; berputar dan sedikit membesar mengikuti scroll */
+.bumi-img {
+    position: absolute; left: 50%; top: 58%; width: min(120vmin, 1050px); aspect-ratio: 1; translate: -50% -50%;
+    background: url('../img/bumi.webp') center / contain no-repeat;
+    transform: scale(calc(0.82 + var(--p) * 0.28)) rotate(calc(var(--p) * 16deg));
+}
 
 @media (max-width: 1023px), (max-height: 680px), (prefers-reduced-motion: reduce) {
     .trek { height: auto; padding: 1.25rem 0; }
