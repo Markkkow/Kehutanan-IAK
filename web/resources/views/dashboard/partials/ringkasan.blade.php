@@ -1,31 +1,6 @@
 @use('App\Support\Format', 'F')
 
 @php
-    // [kunci deret, ikon, label, nilai, satuan, keterangan, [perubahan, teks, naik-itu-baik?], kode]
-    $tiles = [
-        ['primer', 'pohon', 'Hutan primer '.$kpi['primer']['tahun'], F::ringkas($kpi['primer']['nilai']), 'ha',
-            null, [$kpi['primer']['perubahan'], 'vs 2018', true], 'D1'],
-        ['tutupan', 'daun', 'Tutupan hutan '.$kpi['tutupan']['tahun'], F::ringkas($kpi['tutupan']['nilai']), 'ha',
-            F::persen($kpi['tutupan']['persen']).' daratan', [$kpi['tutupan']['perubahan'], 'vs 2018', true], 'D2'],
-        ['karhutla', 'api', 'Kebakaran hutan & lahan '.$kpi['karhutla']['tahun'], F::ringkas($kpi['karhutla']['nilai']), 'ha',
-            null, [$kpi['karhutla']['perubahan'], 'vs 2018', false], 'D3'],
-        ['kayu', 'kayu', 'Produksi kayu bulat '.$kpi['kayu']['tahun'], F::ringkas($kpi['kayu']['nilai']), 'm³',
-            null, [$kpi['kayu']['perubahan'], 'vs 2018', null], 'D4'],
-        ['deforestasi', 'kapak', 'Deforestasi netto '.str_replace('-', '–', $kpi['deforestasi']['periode']), F::ringkas($kpi['deforestasi']['nilai']), 'ha/th',
-            null, [$kpi['deforestasi']['perubahan'], 'vs 2018–2019', false], 'D5'],
-    ];
-    $temuan = [
-        ['kelas-lahan', 'pohon', 'D1', 'Hutan bertambah, hutan primer berkurang',
-            'Total hutan naik '.F::ringkas($kelas['hutan_akhir'] - $kelas['hutan_awal']).' ha ('.$kelas['awal'].'–'.$kelas['akhir'].'), tetapi hutan primer turun '.F::ringkas(abs($kelas['selisih']['primer'])).' ha. Yang bertambah hutan sekunder dan hutan tanaman.'],
-        ['karhutla', 'api', 'D3', 'Karhutla meledak di tahun El Niño',
-            'Luas terbakar '.$karhutla['puncak'].' mencapai '.F::ringkas($karhutla['nasional'][$karhutla['puncak']]).' ha dan '.$karhutla['puncak_kedua'].' '.F::ringkas($karhutla['nasional'][$karhutla['puncak_kedua']]).' ha, beberapa kali lipat tahun lain.'],
-        ['deforestasi', 'kapak', 'D5', 'Laju deforestasi turun tajam sejak 2019',
-            'Dari '.F::ringkas($kpi['deret']['deforestasi']['2018-2019'] ?? null).' ha/th (2018–2019) menjadi '.F::ringkas($kpi['deforestasi']['nilai']).' ha/th ('.str_replace('-', '–', $kpi['deforestasi']['periode']).').'],
-        ['benang-merah', 'kayu', 'G3', 'Produksi kayu paling dekat dengan deforestasi',
-            'Antarprovinsi, kayu ↔ deforestasi r = '.F::angka($benangMerah['r_kayu_defor'], 2).', lebih kuat dari karhutla ↔ deforestasi (r = '.F::angka($benangMerah['r_karhutla_defor'], 2).').'],
-        ['catatan-validasi', 'lapisan', 'D2 vs D5', 'Dua sumber resmi tidak sepakat',
-            'Tutupan hutan (D2) naik '.F::ringkas($validasi['total_d2']).' ha ('.$validasi['periode'].'), padahal deforestasi netto (D5) menunjukkan hutan berkurang.'],
-    ];
     $panelIndeks = [
         ['Hutan primer (D1)', 'primer', 'pohon', 'D1'],
         ['Tutupan hutan (D2)', 'tutupan', 'daun', 'D2'],
@@ -51,79 +26,27 @@
     </div>
 </div>
 
-{{-- 5 Kartu KPI dengan tema masing-masing dataset (D1–D5) --}}
-<div class="relative z-10 -mt-12 grid grid-cols-1 gap-3 px-2 sm:grid-cols-2 md:px-4 lg:grid-cols-5">
-    @foreach ($tiles as [$kunci, $ikon, $label, $nilai, $satuan, $catatan, $delta, $kode])
-        <div data-ds="{{ $kode }}" class="kartu flex flex-col p-4 shadow-[0_10px_28px_-12px_rgba(30,25,10,0.28)]">
-            <x-dekor-ds :kode="$kode" />
-            <div class="relative z-10 flex items-start justify-between gap-2">
-                <span class="ikon-ds size-9"><x-ikon :nama="$ikon" class="size-[18px]" /></span>
-                <span class="lencana-ds">{{ $kode }}</span>
-            </div>
-            <div class="relative z-10 mt-2.5 text-[12.5px] font-medium text-ink-2">{{ $label }}</div>
-            <div class="relative z-10 mt-1 text-[26px] leading-none font-bold tabular-nums">
-                {{ $nilai }}<span class="ml-1 text-sm font-normal text-ink-3">{{ $satuan }}</span>
-            </div>
-            <div class="relative z-10 mt-2 min-h-4 text-xs text-ink-3">
-                @if ($delta)
-                    @php [$v, $teks, $baikNaik] = $delta; $baik = $baikNaik === null ? null : ($baikNaik ? $v > 0 : $v < 0); @endphp
-                    <span @class(['inline-flex items-center rounded-md px-1.5 py-0.5 font-semibold', 'bg-brand-lembut text-brand-teks' => $baik === true,
-                        'bg-peringatan-lembut text-peringatan' => $baik === false, 'bg-surface-2 text-ink-2' => $baik === null])>
-                        {{ $v > 0 ? '↑' : '↓' }} {{ F::persen(abs($v), abs($v) >= 10 ? 0 : 1) }}</span>
-                    {{ $teks }}
-                @endif
-                {{ $catatan }}
-            </div>
-            <div class="relative z-10 mt-auto h-9 pt-2"><canvas id="spark-{{ $kunci }}" aria-hidden="true"></canvas></div>
-        </div>
-    @endforeach
-</div>
-
-<div class="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-    {{-- Tren gabungan 5 data; tiap panel memakai warna khas datanya --}}
-    <div class="kartu">
-        <div class="flex items-center gap-2">
-            <span class="grid size-8 place-items-center rounded-lg bg-brand-lembut text-brand-teks"><x-ikon nama="grafik" class="size-4" /></span>
-            <div class="kartu-judul">Tren gabungan, indeks 2018 = 100</div>
-        </div>
-        <div class="kartu-ket mt-2">Satuan tiap data berbeda, sehingga semuanya diubah ke indeks (nilai tahun itu ÷ nilai 2018 × 100).</div>
-        {{-- 5 panel dalam 2 kolom; panel terakhir selebar kartu agar tidak ada ruang kosong --}}
-        <div class="grid gap-3 sm:grid-cols-2">
-            @foreach ($panelIndeks as [$judul, $kunci, $ikon, $kodePanel])
-                <div data-ds="{{ $kodePanel }}" @class(['subkartu-ds', 'sm:col-span-2' => $loop->last])>
-                    <div class="flex items-center gap-1.5 text-[12.5px] font-semibold text-ink">
-                        <span class="ikon-ds size-6 rounded-lg"><x-ikon :nama="$ikon" class="size-3.5" /></span>
-                        <span>{{ $judul }}</span>
-                    </div>
-                    <div class="mt-1.5 h-28"><canvas id="indeks-{{ $kunci }}" aria-label="Indeks {{ $judul }}"></canvas></div>
+{{-- Tren gabungan 5 data selebar konten; tiap panel memakai warna khas datanya --}}
+<div class="mt-3 kartu">
+    <div class="flex items-center gap-2">
+        <span class="grid size-8 place-items-center rounded-lg bg-brand-lembut text-brand-teks"><x-ikon nama="grafik" class="size-4" /></span>
+        <div class="kartu-judul">Tren gabungan, indeks 2018 = 100</div>
+    </div>
+    <div class="kartu-ket mt-2">Satuan tiap data berbeda, sehingga semuanya diubah ke indeks (nilai tahun itu ÷ nilai 2018 × 100).</div>
+    {{-- Layar lebar: 3 panel di baris atas, 2 panel lebih lebar di baris bawah, agar seluruh lebar terisi tanpa ruang kosong --}}
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        @foreach ($panelIndeks as [$judul, $kunci, $ikon, $kodePanel])
+            <div data-ds="{{ $kodePanel }}" @class(['subkartu-ds', 'lg:col-span-2' => $loop->index < 3, 'lg:col-span-3' => $loop->index >= 3, 'sm:col-span-2' => $loop->last])>
+                <div class="flex items-center gap-1.5 text-[12.5px] font-semibold text-ink">
+                    <span class="ikon-ds size-6 rounded-lg"><x-ikon :nama="$ikon" class="size-3.5" /></span>
+                    <span>{{ $judul }}</span>
                 </div>
-            @endforeach
-        </div>
-        <details class="lihat-tabel" data-tabel-indeks>
-            <summary>Lihat tabel data</summary>
-            <div class="isi"></div>
-        </details>
+                <div class="mt-1.5 h-36"><canvas id="indeks-{{ $kunci }}" aria-label="Indeks {{ $judul }}"></canvas></div>
+            </div>
+        @endforeach
     </div>
-
-    {{-- Temuan utama: warna & lencana mengikuti data/analisis asalnya; temuan lintas sumber (D2 vs D5) memakai warna netral --}}
-    <div class="kartu">
-        <div class="kartu-judul">Temuan utama</div>
-        <ol class="grid gap-2.5">
-            @foreach ($temuan as [$tab, $ikon, $kodeTemuan, $judul, $isi])
-                <li>
-                    <a href="#{{ $tab }}" @if (in_array($kodeTemuan, ['D1', 'D2', 'D3', 'D4', 'D5', 'G2', 'G3'])) data-ds="{{ $kodeTemuan }}" @endif
-                       class="subkartu-ds flex gap-3 p-3 hover:bg-sorot">
-                        <span class="ikon-ds size-8 rounded-lg"><x-ikon :nama="$ikon" class="size-4" /></span>
-                        <span class="min-w-0 flex-1">
-                            <span class="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink">
-                                <span class="lencana-ds">{{ $kodeTemuan }}</span>
-                                <span>{{ $judul }}</span>
-                            </span>
-                            <span class="mt-1 block text-[12.5px] leading-relaxed text-ink-2">{{ $isi }}</span>
-                        </span>
-                    </a>
-                </li>
-            @endforeach
-        </ol>
-    </div>
+    <details class="lihat-tabel" data-tabel-indeks>
+        <summary>Lihat tabel data</summary>
+        <div class="isi"></div>
+    </details>
 </div>

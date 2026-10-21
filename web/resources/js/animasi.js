@@ -2,7 +2,7 @@
  * Animasi bab per data (D1–D5) ala halaman produk: semua gerak terikat posisi scroll (scrub).
  *   Pembuka   : kata judul naik satu per satu, cahaya membesar, angka kunci menghitung dari 0,
  *               lalu layar menempel sebentar dan mengecil saat pembaca lanjut.
- *   Pembahasan: tiga kartu (Terlihat → Kenapa → Lanjut) bergeser ke samping saat digulir ke bawah.
+ *   Pembahasan: tiga kartu (Terlihat → Kenapa → Lanjut) tampil statis sekaligus, tanpa animasi gulir.
  *   Grafik    : kartu naik muncul bertahap.
  * Layar kecil: tanpa "menempel", cukup muncul saat terlihat. prefers-reduced-motion: tanpa animasi (keadaan akhir).
  */
@@ -50,25 +50,6 @@ function animasiPembuka(bab, { tempel }) {
         .to(pembuka.querySelector('.bab-sinar'), { scale: 1.25, duration: 1, ease: 'none' }, 0)
         .to(isi, { scale: 0.9, opacity: 0.25, duration: 1, ease: 'power1.in' }, 0.35)
         .to(pembuka.querySelector('.bab-gulir'), { opacity: 0, duration: 0.3 }, 0);
-}
-
-function animasiPembahasan(bab) {
-    const slide = bab.querySelector('[data-bab-slide]');
-    const jalur = slide.querySelector('.bab-slide-jalur');
-    const kartu = slide.querySelectorAll('.bab-kartu');
-    slide.classList.add('bab-slide-gsap');
-    const jarak = () => Math.max(0, jalur.scrollWidth - slide.clientWidth);
-
-    const geser = gsap.to(jalur, {
-        x: () => -jarak(),
-        ease: 'none',
-        scrollTrigger: { trigger: slide, start: 'center center', end: () => `+=${jarak() + window.innerHeight * 0.25}`, scrub: 0.8, pin: true, anticipatePin: 1, invalidateOnRefresh: true },
-    });
-    // Tiap kartu menyala saat bergeser masuk ke tengah
-    kartu.forEach((k, i) => {
-        if (i === 0) return;
-        gsap.from(k, { opacity: 0.3, scale: 0.94, ease: 'none', scrollTrigger: { trigger: k, containerAnimation: geser, start: 'left 90%', end: 'left 45%', scrub: true } });
-    });
 }
 
 function animasiGrafik(bab) {
@@ -174,10 +155,8 @@ if (daftarBab.length && !window.matchMedia('(prefers-reduced-motion: reduce)').m
         daftarBab.forEach((bab) => {
             animasiPembuka(bab, { tempel: true });
             latarBab(bab, { tempel: true });
-            animasiPembahasan(bab);
             animasiGrafik(bab);
         });
-        return () => document.querySelectorAll('.bab-slide-gsap').forEach((s) => s.classList.remove('bab-slide-gsap'));
     });
     mm.add('(max-width: 1023px)', () => {
         daftarBab.forEach((bab) => {

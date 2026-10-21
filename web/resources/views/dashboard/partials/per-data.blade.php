@@ -118,11 +118,10 @@
             <div class="bab-gulir" aria-hidden="true"><span></span></div>
         </div>
 
-        {{-- 2. Pembahasan: tiga kartu yang bergeser ke samping saat digulir --}}
+        {{-- 2. Pembahasan: tiga kartu tampil sekaligus (statis, tanpa digeser/digulir) --}}
         <div class="bab-slide" data-bab-slide>
             <div class="bab-slide-kepala">
                 <span>Pembahasan {{ $b['kode'] }}</span>
-                <span class="bab-slide-petunjuk"><span class="lebar">Gulir untuk lanjut</span><span class="sempit">Geser kartu</span> →</span>
             </div>
             <div class="bab-slide-jalur">
                 @foreach ($b['slide'] as $n => [$jenis, $isi])
@@ -140,7 +139,3 @@
         </div>
     </section>
 @endforeach
-
-<div class="mt-8">
-    @include('dashboard.partials.catatan-data')
-</div>

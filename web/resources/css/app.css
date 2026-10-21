@@ -528,10 +528,13 @@ html {
     letter-spacing: -0.035em;
     text-wrap: balance;
 }
+/* overflow: hidden dibutuhkan animasi kata naik; padding bawah memberi ruang ekor huruf (g, j, p, y) agar tidak terpotong,
+   margin negatif mengembalikan jarak antarbaris seperti semula */
 .bab-judul .kata {
     display: inline-block;
     overflow: hidden;
-    padding-bottom: 0.08em;
+    padding-bottom: 0.22em;
+    margin-bottom: -0.14em;
     vertical-align: top;
 }
 .bab-judul .kata > span {
@@ -549,6 +552,8 @@ html {
     font-variant-numeric: tabular-nums;
 }
 .bab-angka > span {
+    /* teks gradien hanya terlukis di dalam kotak elemen; padding bawah agar ekor "j" dan koma tidak terpotong */
+    padding-bottom: 0.14em;
     background: linear-gradient(100deg, #ffffff 15%, var(--bab-sinar) 85%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -592,37 +597,34 @@ html {
     to { transform: translateY(260%); }
 }
 
-/* Pembahasan: tanpa JavaScript (dan di HP) = kartu yang bisa digeser jari dengan snap */
+/* Pembahasan: tiga kartu tampil sekaligus (statis). Layar lebar = 3 kolom sejajar, layar kecil = bertumpuk. */
 .bab-slide {
     margin-top: 1.25rem;
 }
 .bab-slide-jalur {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.5rem;
-    scrollbar-width: none;
 }
-.bab-slide-jalur::-webkit-scrollbar { display: none; }
+@media (min-width: 1024px) {
+    .bab-slide-jalur { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 .bab-kartu {
-    flex: 0 0 min(46rem, 86%);
-    scroll-snap-align: start;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    min-height: clamp(13rem, 30vh, 19rem);
-    border-radius: 1.75rem;
+    gap: 1rem;
+    min-width: 0;
+    border-radius: 1.5rem;
     border: 1px solid var(--garis);
     border-top: 4px solid var(--ds-aksen);
-    padding: clamp(1.5rem, 3.5vw, 3rem);
+    padding: clamp(1.25rem, 2.2vw, 2rem);
     background: var(--surface);
 }
 .bab-kartu-kepala {
     display: flex;
     align-items: baseline;
     gap: 0.9rem;
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
     font-weight: 700;
     letter-spacing: -0.025em;
     color: var(--ink);
@@ -634,7 +636,7 @@ html {
     font-variant-numeric: tabular-nums;
 }
 .bab-kartu p {
-    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    font-size: clamp(1rem, 1.15vw, 1.1rem);
     line-height: 1.6;
     color: var(--ink-2);
     text-wrap: pretty;
@@ -649,26 +651,43 @@ html {
     font-weight: 600;
     color: var(--ds-aksen);
 }
-.bab-slide-petunjuk {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--ink-3);
-}
-.bab-slide-petunjuk .lebar { display: none; }
-/* Saat GSAP aktif di layar lebar, jalur digeser oleh scroll (bukan scrollbar); kartu dipotong rapi di tepi konten */
-.bab-slide.bab-slide-gsap {
-    overflow: hidden;
-    padding-block: 0.25rem;
-}
-.bab-slide.bab-slide-gsap .bab-slide-jalur {
-    overflow: visible;
-    scroll-snap-type: none;
-}
-.bab-slide.bab-slide-gsap .bab-slide-petunjuk .lebar { display: inline; }
-.bab-slide.bab-slide-gsap .bab-slide-petunjuk .sempit { display: none; }
-
 .bab-grafik {
     margin-top: 1.25rem;
+}
+
+/* Panel grafik di Per data: bersih tanpa warna data (tanpa garis atas berwarna, ikon/lencana/kotak ringkasan netral) */
+.bab-grafik .kartu[data-ds] {
+    border-color: var(--garis);
+    background-image: none;
+}
+.bab-grafik .ikon-ds,
+.bab-grafik .lencana-ds,
+.bab-grafik .tombol-info {
+    background-color: var(--surface-2);
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--garis);
+}
+.bab-grafik .tombol-info {
+    border-color: var(--garis);
+    box-shadow: none;
+}
+.bab-grafik .ringkas-ds {
+    border-left: 0;
+    border-radius: 0;
+    padding-inline: 0;
+    background: none;
+}
+.bab-grafik .pilih,
+.bab-grafik details.lihat-tabel .isi {
+    border-color: var(--garis);
+}
+.bab-grafik details.lihat-tabel[open] summary {
+    color: var(--ink-2);
+    background-color: var(--surface-2);
+}
+.bab-grafik .tabel-data th {
+    color: var(--ink-3);
+    background-color: var(--surface-2);
 }
 
 /* Penanda bab di kanan: hanya layar lebar, muncul saat bagian Per data terlihat */
