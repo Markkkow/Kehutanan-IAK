@@ -598,7 +598,7 @@ function perbaruiTrek() {
         if (r.top > tinggi || r.bottom < 0) return;
         if (r.top <= 0 && r.bottom >= tinggi * 0.5) {
             const ke = palet[Math.min(i + 1, palet.length - 1)];
-            const w = Math.min(1, Math.max(0, (p - 0.7) / 0.3));
+            const w = Math.min(1, Math.max(0, (p - 0.55) / 0.45));
             warna = i + 1 < palet.length && w > 0 ? `color-mix(in srgb, ${ke} ${(w * 100).toFixed(1)}%, ${palet[i]})` : palet[i];
         } else if (i === 0 && r.top > 0) {
             const w = Math.min(1, Math.max(0, 1 - r.top / tinggi));

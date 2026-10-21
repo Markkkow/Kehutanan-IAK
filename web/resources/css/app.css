@@ -222,13 +222,9 @@
         box-shadow: 0 6px 18px -8px rgba(30, 42, 31, 0.14);
     }
 
-    /* Kartu dengan tema dataset atau analisis gabungan: garis aksen tipis di atas + bingkai berwarna lembut */
+    /* Kartu bertema dataset/analisis gabungan: bingkai netral (warna data hanya di dalam panel: ikon, lencana, grafik) */
     .kartu[data-ds] {
-        border-color: var(--ds-garis);
-        background-image: linear-gradient(var(--ds-aksen), var(--ds-aksen));
-        background-size: 100% 3px;
-        background-position: top left;
-        background-repeat: no-repeat;
+        border-color: var(--garis);
     }
 
     /* Sub-kartu beridentitas dataset (mis. panel indeks G1, kotak metrik G2) */
@@ -562,53 +558,47 @@ html {
 
 
 /* ==========================================================================
- * PANGGUNG SCROLL (per data): layar menempel, adegan & latar bergerak mengikuti scroll (var --p: 0 -> 1)
- * Tiap data = satu "lintasan" tinggi; panggung di dalamnya sticky. Di layar kecil / gerak dikurangi: tanpa menempel.
+ * PANGGUNG SCROLL (per data): panel visualisasi menempel; latar bergerak mengikuti scroll (var --p: 0 -> 1).
+ * Tanpa teks penghubung: D1 langsung ke D2. Di layar kecil / gerak dikurangi: tanpa menempel.
  * ========================================================================== */
-.trek { position: relative; height: 300vh; --p: 0; }
+.trek { position: relative; height: 200vh; --p: 0; }
 .panggung {
     position: sticky; top: 0; height: 100dvh; overflow: hidden;
     padding-top: 4.6rem; display: flex; flex-direction: column; justify-content: center;
 }
-.adegan {
-    position: absolute; inset: 4.6rem 0 0 0; display: grid; place-content: center; text-align: center; padding: 0 1rem;
-    opacity: clamp(0, calc(1 - (var(--p) - 0.3) * 6), 1);
-    transform: translateY(calc(clamp(0, (var(--p) - 0.3) * 6, 1) * -40px));
-    pointer-events: none;
-}
-.adegan h2 { font-family: var(--font-tampil); font-weight: 800; letter-spacing: -0.03em; font-size: clamp(2rem, 6vw, 4.5rem); line-height: 1.02; text-wrap: balance; }
-.adegan p { margin: 0.9rem auto 0; max-width: 34rem; font-size: clamp(0.95rem, 1.6vw, 1.2rem); color: var(--ink-2); }
-.adegan .tile-tag { justify-self: center; margin-bottom: 1rem; }
-.pemandangan { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.latar-adegan { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.pemandangan { position: absolute; inset: 0; }
 .pemandangan i { position: absolute; display: block; background: var(--deko, var(--brand)); opacity: 0.85; }
 .isi-data {
-    position: relative; margin: 0 auto; width: 100%; max-width: 1360px; padding: 0 1.5rem; max-height: calc(100dvh - 6rem); overflow: auto;
-    opacity: clamp(0, calc((var(--p) - 0.4) * 5), 1);
-    transform: translateY(calc((1 - clamp(0, (var(--p) - 0.4) * 4, 1)) * 70px));
+    position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 1360px; padding: 0 1.5rem; max-height: calc(100dvh - 6rem); overflow: auto;
+    /* masuk di awal lintasan, keluar di akhir (halus), langsung ke panel data berikutnya */
+    opacity: clamp(0, min(calc(var(--p) * 12), calc((1 - var(--p)) * 12)), 1);
+    transform: translateY(calc((1 - clamp(0, var(--p) * 10, 1)) * 56px - clamp(0, (var(--p) - 0.9) * 10, 1) * 56px));
 }
-.isi-data .kepala-data { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; margin-bottom: 0.9rem; }
-.isi-data .kepala-data h3 { font-family: var(--font-tampil); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(1.4rem, 3vw, 2rem); }
-.isi-data .kepala-data p { font-size: 13px; color: var(--ink-2); }
 
 /* pohon: tumbuh (D1) atau menghilang (D5) mengikuti scroll; --d = jeda tiap pohon */
 .pemandangan.pohon i { bottom: 0; left: var(--x); width: calc(var(--s) * 74px); height: calc(var(--s) * 120px); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
 .pemandangan.tumbuh i { transform: scaleY(clamp(0.05, calc(var(--p) * 3.2 - var(--d)), 1)); }
 .pemandangan.hilang i { transform: scaleY(clamp(0.04, calc(1.25 - (var(--p) * 3.2 - var(--d))), 1)); }
-/* lingkaran: tutupan meluas (D2) / lingkar kayu (D4) */
-.pemandangan.meluas i { left: 50%; top: 58%; border-radius: 50%; translate: -50% -50%; width: calc((18vmin + var(--p) * 110vmin) * var(--s)); aspect-ratio: 1; opacity: calc(0.32 / var(--s)); }
+/* lingkar kayu (D4) */
 .pemandangan.cincin i { left: 50%; top: 58%; border-radius: 50%; translate: -50% -50%; background: transparent; border: 3px solid var(--deko); width: calc((14vmin + var(--p) * 70vmin) * var(--s)); aspect-ratio: 1; }
-/* bara api naik (D3) */
-.pemandangan.bara i { bottom: -12px; left: var(--x); width: calc(var(--s) * 10px); aspect-ratio: 1; border-radius: 50%; opacity: clamp(0, calc(1.1 - var(--p) * 2.2), 0.9); transform: translateY(calc(var(--p) * var(--v) * -95vh)); }
+/* bara api naik dari bawah terus-menerus (D3) */
+.pemandangan.bara i { bottom: -12px; left: var(--x); width: calc(var(--s) * 10px); aspect-ratio: 1; border-radius: 50%; opacity: 0; animation: bara-naik calc(5s + var(--v) * 4s) linear infinite; animation-delay: calc(var(--t) * -1s); }
+@keyframes bara-naik {
+    0% { transform: translate(0, 0); opacity: 0; }
+    10% { opacity: 0.9; }
+    70% { opacity: 0.55; }
+    100% { transform: translate(calc(var(--v) * 24px - 12px), -88vh); opacity: 0; }
+}
+/* bumi (D2): berputar dan sedikit membesar mengikuti scroll */
+.bumi-svg { position: absolute; left: 50%; top: 58%; width: min(115vmin, 1100px); translate: -50% -50%; transform: scale(calc(0.8 + var(--p) * 0.3)); }
+.bumi-darat { transform: translateX(calc(var(--p) * -230px)); }
 
 @media (max-width: 1023px), (max-height: 680px), (prefers-reduced-motion: reduce) {
-    .trek { height: auto; padding: 2rem 0 2.5rem; }
+    .trek { height: auto; padding: 1.25rem 0; }
     .panggung { position: static; height: auto; overflow: visible; padding-top: 0; }
-    .adegan { position: static; inset: auto; opacity: 1; transform: none; padding: 0 0 1rem; text-align: left; place-content: start; }
-    .adegan h2 { font-size: 1.7rem; }
-    .adegan p, .pemandangan { display: none; }
-    .adegan .tile-tag { justify-self: start; margin-bottom: 0.5rem; }
+    .latar-adegan { display: none; }
     .isi-data { opacity: 1; transform: none; max-height: none; overflow: visible; padding: 0; }
-    .isi-data .kepala-data { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { body, header.sticky, .tile { transition: none; } }
 
