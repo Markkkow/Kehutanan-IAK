@@ -105,10 +105,8 @@
     <section class="bab" id="bab-{{ strtolower($b['kode']) }}" data-ds="{{ $b['kode'] }}" data-bab>
         {{-- 1. Pembuka: judul temuan + angka kunci --}}
         <div class="bab-pembuka" data-bab-pembuka>
+            @include('dashboard.partials.bab-latar', ['kode' => $b['kode']])
             <div class="bab-sinar" aria-hidden="true"></div>
-            @if ($b['kode'] === 'D3')
-                @include('dashboard.partials.bab-latar-api')
-            @endif
             <div class="bab-pembuka-isi">
                 <p class="bab-kode"><x-ikon :nama="$b['ikon']" class="size-4" /><span>{{ $b['kode'] }}</span>{{ $b['label'] }}</p>
                 <h2 class="bab-judul">@foreach (explode(' ', $b['judul']) as $kata)<span class="kata"><span>{{ $kata }}</span></span> @endforeach</h2>

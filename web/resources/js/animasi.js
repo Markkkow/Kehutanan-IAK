@@ -79,18 +79,22 @@ function animasiGrafik(bab) {
     });
 }
 
-// Latar D3: api "datang" (menyala bertahap) saat bab terbakar masuk layar; pepohonan bergerak beda kecepatan
-function latarApi(bab, { tempel }) {
-    const latar = bab.querySelector('[data-latar-api]');
+// Latar layar penuh: tiap lapisan bergerak dengan kecepatan berbeda (parallax); D3 juga "menyala" saat masuk layar
+function latarBab(bab, { tempel }) {
+    const latar = bab.querySelector('[data-latar]');
     if (!latar) return;
     const pembuka = bab.querySelector('[data-bab-pembuka]');
-    gsap.fromTo(latar, { '--api': 0 }, {
-        '--api': 1, ease: 'none',
+    gsap.fromTo(latar, { '--nyala': 0 }, {
+        '--nyala': 1, ease: 'none',
         scrollTrigger: { trigger: pembuka, start: 'top 90%', end: tempel ? 'top top' : 'top 30%', scrub: 0.8 },
     });
-    const gulir = { trigger: pembuka, start: 'top bottom', end: 'bottom top', scrub: true };
-    gsap.fromTo(latar.querySelector('.latar-api-dekat'), { yPercent: 10 }, { yPercent: -6, ease: 'none', scrollTrigger: gulir });
-    gsap.fromTo(latar.querySelector('.latar-api-jauh'), { yPercent: 4 }, { yPercent: -2, ease: 'none', scrollTrigger: gulir });
+    latar.querySelectorAll('[data-lapis]').forEach((lapis) => {
+        const k = Number(lapis.dataset.lapis);
+        gsap.fromTo(lapis, { yPercent: k * 18 }, {
+            yPercent: -k * 14, ease: 'none',
+            scrollTrigger: { trigger: pembuka, start: 'top bottom', end: tempel ? '+=200%' : 'bottom top', scrub: true },
+        });
+    });
 }
 
 // Bara api: partikel kecil menyala yang naik & bergoyang. Hanya berjalan saat kanvasnya terlihat.
@@ -169,7 +173,7 @@ if (daftarBab.length && !window.matchMedia('(prefers-reduced-motion: reduce)').m
     mm.add('(min-width: 1024px)', () => {
         daftarBab.forEach((bab) => {
             animasiPembuka(bab, { tempel: true });
-            latarApi(bab, { tempel: true });
+            latarBab(bab, { tempel: true });
             animasiPembahasan(bab);
             animasiGrafik(bab);
         });
@@ -178,7 +182,7 @@ if (daftarBab.length && !window.matchMedia('(prefers-reduced-motion: reduce)').m
     mm.add('(max-width: 1023px)', () => {
         daftarBab.forEach((bab) => {
             animasiPembuka(bab, { tempel: false });
-            latarApi(bab, { tempel: false });
+            latarBab(bab, { tempel: false });
             animasiGrafik(bab);
         });
     });
